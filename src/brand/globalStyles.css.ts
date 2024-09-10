@@ -12,6 +12,11 @@ globalStyle("html, body", {
 	fontSize: 14,
 });
 
+globalStyle("*", {
+	boxSizing: "border-box"
+});
+
+
 globalStyle("a", {
 	textDecoration: "none",
 	color: "currentColor",

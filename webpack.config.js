@@ -13,6 +13,9 @@ module.exports = {
 		filename: "bundle.[fullhash].js",
 		path: path.resolve(__dirname, "dist"),
 	},
+	devServer: {
+		historyApiFallback: true,
+	},
 	plugins: [
 		new CopyPlugin({
 			patterns: [{ from: "static", to: "" }],

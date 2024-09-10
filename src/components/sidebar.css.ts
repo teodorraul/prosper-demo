@@ -3,7 +3,7 @@ import { recipe } from "@vanilla-extract/recipes";
 
 export const SidebarStyle = style({
 	background: "transparent",
-	width: "200px",
+	width: "300px",
 	minHeight: "100vh",
 	padding: "30px 30px",
 	display: "flex",
