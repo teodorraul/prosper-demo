@@ -8,7 +8,7 @@ export const MainPageHeader: React.FC<{
 	return (
 		<header className={MainPageHeaderStyle}>
 			<h1>{title}</h1>
-			{actions}
+			<div>{actions}</div>
 		</header>
 	);
 };

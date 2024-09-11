@@ -1,19 +1,18 @@
-import React from "react";
-import { createRoot } from "react-dom/client";
+import { Provider } from 'mobx-react';
+import React, { lazy, Suspense } from 'react';
+import { createRoot } from 'react-dom/client';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 
-import "supabase/index";
-import {
-	createBrowserRouter,
-	Navigate,
-	RouterProvider,
-} from "react-router-dom";
-import { RouteAgents } from "./routes/agents";
-import { AnotherPage } from "./routes/another-page";
-import { IndexRoutesContainer } from "./routes";
+import { LoadingScreen } from './components/loadingScreen';
+import { IndexRoutesContainer } from './routes';
+import { RouteAgents } from './routes/agents';
+import { AnotherPage } from './routes/another-page';
+import Store from './store/root.store';
 
 const rootElement = document.querySelector("#root");
 if (!rootElement) throw new Error("Failed to find the root element");
 
+const AgentsIdRoute = lazy(() => import("./routes/agents.id"));
 const root = createRoot(rootElement);
 
 const router = createBrowserRouter([
@@ -31,10 +30,21 @@ const router = createBrowserRouter([
 			},
 		],
 	},
+	{
+		path: "/agents/:id",
+		//teo
+		element: (
+			<Suspense fallback={<LoadingScreen />}>
+				<AgentsIdRoute />
+			</Suspense>
+		),
+	},
 ]);
 
 root.render(
 	<React.StrictMode>
-		<RouterProvider router={router} />
+		<Provider value={Store}>
+			<RouterProvider router={router} />
+		</Provider>
 	</React.StrictMode>
 );

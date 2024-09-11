@@ -1,6 +1,7 @@
 {
     "editor.formatOnSave": true,
     "importSorter.sortConfiguration.removeUnusedImports": true,
+    "importSorter.generalConfiguration.sortOnBeforeSave": true,
     "files.exclude": {
         "**/.git": true,
         "**/.svn": true,

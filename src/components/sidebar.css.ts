@@ -1,5 +1,5 @@
-import { style } from "@vanilla-extract/css";
-import { recipe } from "@vanilla-extract/recipes";
+import { style } from '@vanilla-extract/css';
+import { recipe } from '@vanilla-extract/recipes';
 
 export const SidebarStyle = style({
 	background: "transparent",
@@ -18,8 +18,11 @@ export const LogoHolderStyle = style({
 
 export const SidebarLinkStyle = recipe({
 	base: {
-		padding: "10px 10px 13px 15px",
+		padding: "6px 10px 9px 15px",
 		borderRadius: 10,
+		minHeight: 40,
+		display: "flex",
+		alignItems: "center",
 	},
 	variants: {
 		active: {
