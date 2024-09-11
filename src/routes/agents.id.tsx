@@ -1,5 +1,7 @@
+import { AgentEditor } from "src/complexities/agentEditor";
+
 const AgentsIdRoute = () => {
-	return <h1>Test</h1>;
+	return <AgentEditor />;
 };
 
 export default AgentsIdRoute;

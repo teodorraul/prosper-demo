@@ -1,11 +1,20 @@
+import "@xyflow/react/dist/base.css";
+
 import { observer } from "mobx-react";
 import { useEffect, useMemo, useState } from "react";
+import { Button } from "src/components/button";
+import { Logo } from "src/components/logo";
 import { useStore } from "src/store/useStore";
 
 import { Background, BackgroundVariant, ReactFlow } from "@xyflow/react";
 
-import { AgentEditorStyle } from "./agentEditor.css";
-import { AgentEditorNodesStart } from "./agentEditor.nodes.start";
+import {
+	AgentEditorChartStyle,
+	AgentEditorHeader,
+	AgentEditorSidebar,
+	AgentEditorStyle,
+} from "./agentEditor.css";
+import { AgentEditorNodesStart } from "./agentEditorNodesStart";
 
 export const AgentEditor = observer(() => {
 	const nodeTypes = useMemo(
@@ -19,7 +28,7 @@ export const AgentEditor = observer(() => {
 		[]
 	);
 
-	const store = useStore();
+	const rootStore = useStore();
 
 	const [isSpacePressed, setIsSpacePressed] = useState(false);
 
@@ -63,22 +72,28 @@ export const AgentEditor = observer(() => {
 		};
 	}, []);
 
+	let store = rootStore.agentEditor;
+	let state = store.state;
 	return (
-		<div style={{ width: "100vw", height: "100vh" }}>
+		<main className={AgentEditorStyle}>
+			<div className={AgentEditorHeader}>
+				<Button title="←" circle type="subtle" to="/agents" />
+				<Logo />
+			</div>
 			<ReactFlow
-				nodes={store.chart.nodes}
-				edges={store.chart.edges}
-				onViewportChange={store.chart.onViewportChange}
-				edgeTypes={edgeTypes}
+				nodes={state.nodes}
+				edges={state.edges}
+				onViewportChange={store.handleViewportChange}
+				// edgeTypes={edgeTypes}
 				nodeTypes={nodeTypes}
-				viewport={store.chart.viewport}
-				onNodesChange={store.chart.onNodesChange}
-				onEdgesChange={store.chart.onEdgesChange}
+				viewport={store.viewport}
+				// onNodesChange={store.chart.onNodesChange}
+				// onEdgesChange={store.chart.onEdgesChange}
 				nodesFocusable
-				onConnect={store.chart.onConnection}
+				// onConnect={store.chart.onConnection}
 				// onlyRenderVisibleElements={true}
-				proOptions={proOptions}
-				fitViewOptions={initialZoomOption}
+				// proOptions={proOptions}
+				// fitViewOptions={initialZoomOption}
 				nodesDraggable={!isSpacePressed}
 				nodesConnectable={!isSpacePressed}
 				elementsSelectable={!isSpacePressed}
@@ -90,19 +105,22 @@ export const AgentEditor = observer(() => {
 					e.preventDefault();
 					e.stopPropagation();
 				}}
+				zoomOnScroll={false}
+				panOnScroll={true}
+				className={AgentEditorChartStyle}
 				panOnDrag={isSpacePressed}
 				zoomOnDoubleClick={false}
-				multiSelectionKeyCode={"Space"}
 			>
 				<Background
 					id="1"
 					className={AgentEditorStyle}
 					gap={25}
 					size={2}
-					color="#404346"
+					color="rgba(0,0,0,0.2)"
 					variant={BackgroundVariant.Dots}
 				/>
 			</ReactFlow>
-		</div>
+			<aside className={AgentEditorSidebar}></aside>
+		</main>
 	);
 });

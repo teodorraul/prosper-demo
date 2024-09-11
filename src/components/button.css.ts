@@ -69,6 +69,28 @@ export const ButtonStyle = recipe({
 					backgroundColor: Colors.main.s2,
 				},
 			},
+			subtle: {
+				backgroundColor: 'rgba(0,0,0,0.0)',
+				color: '#000',
+				boxShadow: 'none',
+				"&:hover": {
+					backgroundColor: 'rgba(0,0,0,0.05)',
+				},
+				"&:active": {
+					backgroundColor: 'rgba(0,0,0,0.1)',
+				},
+			},
 		},
+		shape: {
+			normal: {},
+			circle: {
+				width: 32,
+				height: 32,
+				display: 'flex',
+				alignItems: 'center',
+				justifyContent: 'center',
+				borderRadius: 999
+			}
+		}
 	},
 });

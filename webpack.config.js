@@ -12,6 +12,7 @@ module.exports = {
 	output: {
 		filename: "bundle.[fullhash].js",
 		path: path.resolve(__dirname, "dist"),
+		publicPath: '/'
 	},
 	devServer: {
 		historyApiFallback: true,
@@ -51,7 +52,7 @@ module.exports = {
 				use: ["file-loader"],
 			},
 			{
-				test: /\.vanilla\.css$/i,
+				test: /\.css$/i,
 				use: [
 					MiniCssExtractPlugin.loader,
 					{

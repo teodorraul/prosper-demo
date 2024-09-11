@@ -1,11 +1,11 @@
-import { globalStyle } from "@vanilla-extract/css";
-import { Inter } from "./typography.css";
+import { globalStyle } from '@vanilla-extract/css';
+
+import { Inter } from './typography.css';
 
 globalStyle("html, body", {
 	margin: 0,
 	padding: 0,
 	backgroundColor: `#e6eced`,
-	fontFamily: Inter,
 	WebkitFontSmoothing: "antialiased",
 	MozOsxFontSmoothing: "grayscale",
 	textRendering: "optimizeLegibility",
@@ -13,6 +13,7 @@ globalStyle("html, body", {
 });
 
 globalStyle("*", {
+	fontFamily: Inter,
 	boxSizing: "border-box"
 });
 

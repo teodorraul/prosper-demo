@@ -1,12 +1,19 @@
-import { useCallback, useState } from 'react';
+import { HTMLAttributes, useCallback, useMemo, useState } from "react";
+import { Link, LinkProps } from "react-router-dom";
 
-import { ButtonStyle, LoaderMaskStyle, LoaderStyle } from './button.css';
+import { RecipeVariants } from "@vanilla-extract/recipes";
 
-export const Button: React.FC<{
-	title: String;
-	action?: () => void;
-	asyncAction?: () => void;
-}> = ({ title, action, asyncAction }) => {
+import { ButtonStyle, LoaderMaskStyle, LoaderStyle } from "./button.css";
+
+export const Button: React.FC<
+	{
+		title: String;
+		action?: () => void;
+		asyncAction?: () => void;
+		circle?: boolean;
+		to?: string;
+	} & RecipeVariants<typeof ButtonStyle>
+> = ({ title, to, type = "primary", action, asyncAction, circle }) => {
 	const [isLoading, setIsLoading] = useState(false);
 
 	const handleClick = useCallback(async () => {
@@ -21,10 +28,33 @@ export const Button: React.FC<{
 		}
 	}, [action]);
 
+	const { Tag, props } = useMemo(() => {
+		if (to) {
+			const props: LinkProps = {
+				to,
+				onClick: undefined,
+			};
+			return {
+				Tag: Link,
+				props,
+			};
+		} else {
+			const props: HTMLAttributes<HTMLDivElement> = {};
+			return {
+				Tag: "div",
+				props,
+			};
+		}
+	}, [to]);
+
 	return (
-		<button
+		<Tag
 			onClick={handleClick}
-			className={ButtonStyle({ type: "primary" })}
+			className={ButtonStyle({
+				type: type,
+				shape: circle ? "circle" : "normal",
+			})}
+			{...props}
 		>
 			{isLoading && (
 				<div className={LoaderMaskStyle}>
@@ -32,6 +62,6 @@ export const Button: React.FC<{
 				</div>
 			)}
 			<span style={isLoading ? { opacity: 0 } : undefined}>{title}</span>
-		</button>
+		</Tag>
 	);
 };

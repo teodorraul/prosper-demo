@@ -1,11 +1,13 @@
-import { observer } from 'mobx-react';
-import { CSSProperties, useMemo } from 'react';
+import { observer } from "mobx-react";
+import { CSSProperties, useMemo } from "react";
 
-import { Handle, NodeProps, Position } from '@xyflow/react';
+import { Handle, NodeProps, Position } from "@xyflow/react";
 
 import {
-    aensContainerStyle, aensInnerStyle, aensOutlineStyle
-} from './agentEditor.nodes.start.css';
+	aensContainerStyle,
+	aensInnerStyle,
+	aensOutlineStyle,
+} from "./agentEditorNodesStart.css";
 
 export const AgentEditorNodesStart: React.FC<NodeProps> = observer(
 	({ id, data, selected, ...props }) => {

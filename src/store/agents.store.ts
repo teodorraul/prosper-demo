@@ -27,7 +27,7 @@ export class AgentsStore {
 	};
 
 	@action
-	storeAgent(agent: Agent) {
+	storeAgent = (agent: Agent) => {
 		this.agents.set(agent.id, agent);
 	}
 
