@@ -13,16 +13,18 @@ export const Button: React.FC<
 		circle?: boolean;
 		to?: string;
 		center?: boolean;
+		className?: string;
 	} & RecipeVariants<typeof ButtonStyle>
 > = ({
 	title,
 	to,
-	type = "primary",
+	type = 'primary',
 	center,
 	action,
 	asyncAction,
 	circle,
 	onClick,
+	className,
 	...otherProps
 }) => {
 	const [isLoading, setIsLoading] = useState(false);
@@ -36,7 +38,7 @@ export const Button: React.FC<
 			} else if (action) {
 				await action(e);
 			} else {
-				console.error("No action assigned to button");
+				console.error('No action assigned to button');
 			}
 		},
 		[action]
@@ -55,7 +57,7 @@ export const Button: React.FC<
 		} else {
 			const props: HTMLAttributes<HTMLDivElement> = {};
 			return {
-				Tag: "div",
+				Tag: 'div',
 				props,
 			};
 		}
@@ -65,11 +67,11 @@ export const Button: React.FC<
 		<Tag
 			onClick={handleClick}
 			{...otherProps}
-			className={ButtonStyle({
+			className={`${ButtonStyle({
 				type: type,
-				align: center ? "center" : "normal",
-				shape: circle ? "circle" : "normal",
-			})}
+				align: center ? 'center' : 'normal',
+				shape: circle ? 'circle' : 'normal',
+			})} ${className}`}
 			{...props}
 		>
 			{isLoading && (

@@ -6,7 +6,7 @@ import { FetchStatus } from './utils';
 
 const TABLE = 'agents_2018';
 export class AgentsStore {
-	@observable accessor byId = observable.map<number, Agent>();
+	@observable accessor byId = observable.map<string, Agent>();
 	@observable accessor fetchStatus: FetchStatus = 'initial';
 
 	fetchAgents = async (destroyCache: boolean = false) => {
@@ -46,7 +46,7 @@ export class AgentsStore {
 
 	@action.bound
 	storeAgents(agents: Agent[]) {
-		this.byId = observable.map<number, Agent>();
+		this.byId = observable.map<string, Agent>();
 		for (const agent of agents) {
 			this.byId.set(agent.id, agent);
 		}

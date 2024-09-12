@@ -2,7 +2,7 @@ import { observer } from 'mobx-react';
 import { useParams } from 'react-router-dom';
 import { useStore } from 'src/store/useStore';
 
-import { useAgentEditorNodeFormattedDetails, useNode } from './agentEditorNode.hooks';
+import { useAgentEditorNodeFormattedDetails, useNodeDetails } from './agentEditorNode.hooks';
 import {
     AgentEditorSidebarCardStyle, AgentEditorSidebarContainerStyle, AgentEditorSidebarStyle,
     AgentEditorSidebarTitleStyle
@@ -13,8 +13,9 @@ export const AgentEditorSidebar = observer(() => {
 
 	const store = useStore();
 	const selectedNodeId = store.agentEditor.selectedNode;
-	const selectedNode = useNode(agentId, selectedNodeId);
-	const { formattedTitle } = useAgentEditorNodeFormattedDetails(selectedNode);
+	const selectedNodeDetails = useNodeDetails(agentId, selectedNodeId);
+	const { formattedTitle } =
+		useAgentEditorNodeFormattedDetails(selectedNodeDetails);
 
 	return (
 		<aside className={AgentEditorSidebarContainerStyle}>

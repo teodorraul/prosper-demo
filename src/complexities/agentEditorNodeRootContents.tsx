@@ -1,22 +1,16 @@
 import { Button } from 'src/components/button';
 import { Text } from 'src/components/text';
 
-import { AgentEditorGlobalNodeRow } from './agentEditorGlobalNodeRow';
-import {
-    useAgentEditorNodeFormattedDetails, useGlobalNodes, useNode
-} from './agentEditorNode.hooks';
-import {
-    AENGlobalNodesContainerStyle, AENGlobalNodesTitle
-} from './agentEditorNodeRootContents.css';
+import { useAgentEditorNodeFormattedDetails, useNodeDetails } from './agentEditorNode.hooks';
+import { AENGlobalNodesTitle } from './agentEditorNodeRootContents.css';
 
 export const AgentEditorNodeRootContents: React.FC<{
-	agentId: string;
 	nodeId: string;
-}> = ({ agentId, nodeId }) => {
-	const node = useNode(agentId, nodeId);
+}> = ({ nodeId }) => {
+	const nodeDetails = useNodeDetails(nodeId);
 	const { formattedTitle, formattedDescription } =
-		useAgentEditorNodeFormattedDetails(node);
-	const globalNodesIds = useGlobalNodes(agentId);
+		useAgentEditorNodeFormattedDetails(nodeDetails);
+	// const globalNodesIds = useGlobalNodes(agentId);
 	return (
 		<div>
 			<Text level="title" ctx="node">
@@ -27,7 +21,7 @@ export const AgentEditorNodeRootContents: React.FC<{
 			</Text>
 			<div>
 				<h6 className={AENGlobalNodesTitle}>Global Behaviours</h6>
-				<ul className={AENGlobalNodesContainerStyle}>
+				{/* <ul className={AENGlobalNodesContainerStyle}>
 					{globalNodesIds?.map((id) => {
 						return (
 							<AgentEditorGlobalNodeRow
@@ -37,7 +31,7 @@ export const AgentEditorNodeRootContents: React.FC<{
 							/>
 						);
 					})}
-				</ul>
+				</ul> */}
 				<Button title="Add new Behaviour" center type="subtlePrimary" />
 			</div>
 		</div>

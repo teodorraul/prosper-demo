@@ -31,7 +31,7 @@ export const RouteAgents = observer(() => {
 		async (agentId, e) => {
 			e.preventDefault();
 			e.stopPropagation();
-			await store.agents.deleteAnAgent(parseInt(agentId));
+			await store.agents.deleteAnAgent(agentId);
 		},
 		[]
 	);

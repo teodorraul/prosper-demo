@@ -1,27 +1,56 @@
 import deepEqual from 'deep-equal';
-import { action, observable, reaction } from 'mobx';
+import { action, IObservableArray, observable, reaction, toJS } from 'mobx';
+import { v4 as uuid } from 'uuid';
 
 import Dagre from '@dagrejs/dagre';
 import { EdgeChange, NodeChange, NodeDimensionChange, Viewport } from '@xyflow/react';
 
 import { AEEdge, AENode } from './agentEditor.types';
-import { Agent } from './agents.types';
+import { Agent, AgentWorkflowNode, RemoteAgentEditorNode } from './agents.types';
 import Store from './root.store';
 
 type MountStatus =
 	| {
-			status: "mounted";
-			forAgentId: number;
+			status: 'mounted';
+			forAgentId: string;
 	  }
-	| { status: "mounting" }
-	| { status: "failedToMount" };
+	| { status: 'mounting' }
+	| { status: 'failedToMount' };
 
-type EditorAction = {
-	type: "select";
-	nodeId: string | undefined;
+type EditorAction =
+	| {
+			type: 'select';
+			nodeId: string | undefined;
+	  }
+	| {
+			type: 'insert-node';
+			nodeId: string | undefined;
+			side: 'right' | 'left';
+	  }
+	| {
+			type: 'remove-node';
+			nodeId: string | undefined;
+			side: 'right' | 'left';
+	  };
+
+type HoveredNode = {
+	id: string;
+	side: 'left' | 'right';
 };
+
+type SyncOperation = {
+	operation: 'upsert-node';
+	node: AgentWorkflowNode;
+	id: string;
+	parentId: string;
+};
+
 export class AgentEditorStore {
 	@observable accessor status: MountStatus | undefined = undefined;
+	@observable accessor nodeDetails = observable.map<
+		string,
+		AgentWorkflowNode
+	>();
 	@observable accessor nodes: AENode[] = [];
 	@observable accessor edges: AEEdge[] = [];
 	@observable accessor selectedNode: string | undefined = undefined;
@@ -32,10 +61,13 @@ export class AgentEditorStore {
 	};
 	private undoStack: EditorAction[] = [];
 	private redoStack: EditorAction[] = [];
+	@observable accessor hoveredNode: HoveredNode | undefined = undefined;
+	@observable accessor syncQueue: IObservableArray<SyncOperation> =
+		observable.array(undefined, { deep: false });
 
-	mountWithAgentId = (agentId: number) => {
+	mountWithAgentId = (agentId: string) => {
 		if (
-			this.status?.status == "mounted" &&
+			this.status?.status == 'mounted' &&
 			this.status?.forAgentId == agentId
 		) {
 			return;
@@ -47,40 +79,96 @@ export class AgentEditorStore {
 			this.buildStateFrom(agent);
 
 			reaction(
-				() => agent,
-				(agent) => {
-					this.buildStateFrom(agent);
+				() => toJS(Store.agents.byId),
+				(agents) => {
+					let agent = agents.get(agentId);
+					if (agent) {
+						this.buildStateFrom(agent);
+					}
 				}
 			);
 
-			this.setMountStatus({ status: "mounted", forAgentId: agentId });
+			reaction(
+				() => this.syncQueue.slice(),
+				(queue) => {
+					let agent = Store.agents.byId.get(agentId);
+					if (agent) {
+						this.buildStateFrom(agent);
+					}
+				}
+			);
+
+			this.setMountStatus({ status: 'mounted', forAgentId: agentId });
 		} else {
-			this.setMountStatus({ status: "failedToMount" });
+			this.setMountStatus({ status: 'failedToMount' });
 		}
 	};
 
+	getNodesAndEdgesFromOperations = () => {
+		const opNodes: AENode[] = [];
+		const opEdges: AEEdge[] = [];
+		const nodeDetails: AgentWorkflowNode[] = [];
+
+		for (const op of this.syncQueue) {
+			switch (op.operation) {
+				case 'upsert-node':
+					opNodes.push({
+						id: op.node.id,
+						type: 'node',
+						position: { x: 0, y: 0 },
+						data: {},
+					});
+					let nodeBootstrap: RemoteAgentEditorNode = {
+						id: op.node.id,
+						node_enter_condition: '',
+						node_name: '',
+						node_type: 'default',
+						prompt: '',
+						is_global: false,
+						user_data: [],
+					};
+					nodeDetails.push(new AgentWorkflowNode(nodeBootstrap));
+					opEdges.push({
+						id: op.node.id + '_edge',
+						type: 'edge',
+						source: op.parentId,
+						target: op.node.id,
+					});
+
+					break;
+			}
+		}
+		return { opNodes, opEdges, nodeDetails };
+	};
+
 	buildStateFrom = async (agent: Agent) => {
+		const { opNodes, opEdges, nodeDetails } =
+			this.getNodesAndEdgesFromOperations();
+
+		this.nodeDetails.replace({});
+
 		let unlayoutedEdges = [
 			...agent.workflow.edges.map((e) => {
 				let node: AEEdge = {
 					id: `${e.id}`,
-					type: "edge",
+					type: 'edge',
 					data: {},
 					source: `${e.source}`,
 					target: `${e.target}`,
 				};
 				return node;
 			}),
+			...opEdges,
 		];
 
 		let unlayoutedNodes: AENode[] = [
 			// We exclude the global nodes, since we handle them as rows...
 			...agent.workflow.nodes
-				.filter((n) => n.nodeType != "global")
+				.filter((n) => n.nodeType != 'global')
 				.map((n) => {
 					let node: AENode = {
 						id: `${n.id}`,
-						type: "node",
+						type: 'node',
 						position: {
 							x: 0,
 							y: 0,
@@ -89,8 +177,17 @@ export class AgentEditorStore {
 					};
 					return node;
 				}),
+			...opNodes,
 		];
 
+		for (let node of agent.workflow.nodes) {
+			this.nodeDetails.set(node.id, node);
+		}
+		for (let node of nodeDetails) {
+			this.nodeDetails.set(node.id, node);
+		}
+
+		console.log(unlayoutedNodes, unlayoutedEdges);
 		const { layoutedEdges, layoutedNodes } = this.layoutTree(
 			unlayoutedNodes,
 			unlayoutedEdges
@@ -100,7 +197,6 @@ export class AgentEditorStore {
 	};
 
 	relayoutNodes = async () => {
-		console.log("Relayouting nodes");
 		const { layoutedEdges, layoutedNodes } = this.layoutTree(
 			this.nodes,
 			this.edges
@@ -115,8 +211,8 @@ export class AgentEditorStore {
 	): { layoutedNodes: AENode[]; layoutedEdges: AEEdge[] } => {
 		const g = new Dagre.graphlib.Graph().setDefaultEdgeLabel(() => ({}));
 		g.setGraph({
-			rankdir: "TB",
-			align: "UL",
+			rankdir: 'TB',
+			align: 'UL',
 			ranksep: 120,
 			nodesep: 80,
 		});
@@ -165,20 +261,21 @@ export class AgentEditorStore {
 
 		for (const change of changes) {
 			switch (change.type) {
-				case "add":
+				case 'add':
 					break;
-				case "dimensions":
+				case 'dimensions':
 					if (change.dimensions) {
+						console.log(change);
 						dimensionChanges.push(change);
 					}
 					break;
-				case "remove":
+				case 'remove':
 					break;
-				case "replace":
+				case 'replace':
 					break;
-				case "position":
+				case 'position':
 					break;
-				case "select":
+				case 'select':
 					// if (change.selected) {
 					// 	this.selectNode(change.id);
 					// } else {
@@ -202,6 +299,7 @@ export class AgentEditorStore {
 				}
 			});
 		}
+		this.relayoutNodes();
 	}
 
 	onEdgesChange = (changes: EdgeChange[]) => {
@@ -215,25 +313,30 @@ export class AgentEditorStore {
 	}
 
 	@action.bound
+	setHoveredNode(node?: HoveredNode) {
+		this.hoveredNode = node;
+	}
+
+	@action.bound
 	setMountStatus(status: MountStatus) {
 		this.status = status;
 	}
 
 	@action.bound
-	selectNode(id: string | undefined, from: ActionSource = "default") {
-		if (from == "default" || from == "redo") {
+	selectNode(id: string | undefined, from: ActionSource = 'default') {
+		if (from == 'default' || from == 'redo') {
 			this.undoStack.push({
-				type: "select",
+				type: 'select',
 				nodeId: this.selectedNode,
 			});
-			if (from == "default") {
+			if (from == 'default') {
 				this.redoStack = [];
 			}
 		}
 
-		if (from == "undo") {
+		if (from == 'undo') {
 			this.redoStack.push({
-				type: "select",
+				type: 'select',
 				nodeId: this.selectedNode,
 			});
 		}
@@ -241,21 +344,66 @@ export class AgentEditorStore {
 		this.selectedNode = id;
 	}
 
+	@action.bound
+	insertNode(
+		parentNodeId: string,
+		side: 'left' | 'right',
+		from: ActionSource = 'default'
+	) {
+		let nodeId = uuid();
+		this.syncQueue.push({
+			operation: 'upsert-node',
+			id: uuid(),
+			parentId: parentNodeId,
+			node: new AgentWorkflowNode({
+				id: nodeId,
+				node_enter_condition: '',
+				node_type: 'default',
+				node_name: '',
+				prompt: '',
+				is_global: false,
+				user_data: [],
+			}),
+		});
+		this.selectNode(nodeId);
+
+		// if (from == 'default' || from == 'redo') {
+		// 	this.undoStack.push({
+		// 		type: 'select',
+		// 		nodeId: this.selectedNode,
+		// 	});
+		// 	if (from == 'default') {
+		// 		this.redoStack = [];
+		// 	}
+		// }
+
+		// if (from == 'undo') {
+		// 	this.redoStack.push({
+		// 		type: 'select',
+		// 		nodeId: this.selectedNode,
+		// 	});
+		// }
+
+		// this.selectedNode = id;
+
+		// console.log(parentNodeId, side, from);
+	}
+
 	executeAction = (action: EditorAction | undefined, from: ActionSource) => {
 		switch (action?.type) {
-			case "select":
+			case 'select':
 				this.selectNode(action.nodeId, from);
 		}
 	};
 
 	undo = () => {
 		const lastAction = this.undoStack.pop();
-		this.executeAction(lastAction, "undo");
+		this.executeAction(lastAction, 'undo');
 	};
 
 	redo = () => {
 		const lastAction = this.redoStack.pop();
-		this.executeAction(lastAction, "redo");
+		this.executeAction(lastAction, 'redo');
 	};
 
 	@action.bound
@@ -266,4 +414,4 @@ export class AgentEditorStore {
 	}
 }
 
-type ActionSource = "default" | "undo" | "redo";
+type ActionSource = 'default' | 'undo' | 'redo';

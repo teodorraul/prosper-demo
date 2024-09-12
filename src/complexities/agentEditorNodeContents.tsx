@@ -4,16 +4,15 @@ import { Text } from 'src/components/text';
 import { AgentWorkflowNode } from 'src/store/agents.types';
 
 import { AEMContextGrid } from './agentEditorNode.css';
-import { useAgentEditorNodeFormattedDetails, useNode } from './agentEditorNode.hooks';
+import { useAgentEditorNodeFormattedDetails, useNodeDetails } from './agentEditorNode.hooks';
 
 export const AgentEditorNodeContents: React.FC<{
-	agentId: string;
 	nodeId: string;
 	node: AgentWorkflowNode;
-}> = ({ agentId, nodeId }) => {
-	const node = useNode(agentId, nodeId);
+}> = ({ nodeId }) => {
+	const nodeDetails = useNodeDetails(nodeId);
 	const { formattedTitle, formattedDescription } =
-		useAgentEditorNodeFormattedDetails(node);
+		useAgentEditorNodeFormattedDetails(nodeDetails);
 	return (
 		<div className="node-container">
 			<Text level="title" ctx="node">
@@ -25,7 +24,7 @@ export const AgentEditorNodeContents: React.FC<{
 					{formattedDescription}
 				</Text>
 			</div>
-			<NodeDataExtracts items={node?.userData} />
+			<NodeDataExtracts items={nodeDetails?.userData} />
 		</div>
 	);
 };

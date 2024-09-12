@@ -1,15 +1,16 @@
 import '@xyflow/react/dist/base.css';
 
 import { observer } from 'mobx-react';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Button } from 'src/components/button';
 import { Logo } from 'src/components/logo';
 import { useClickHandler } from 'src/hooks/useClickHandler';
 import { useAgentEditor } from 'src/store/agentEditor.hooks';
 import { useStore } from 'src/store/useStore';
+import { node } from 'webpack';
 
-import { Background, BackgroundVariant, ReactFlow, useNodesInitialized } from '@xyflow/react';
+import { Background, BackgroundVariant, ReactFlow } from '@xyflow/react';
 
 import { AgentEditorChartStyle, AgentEditorHeader, AgentEditorStyle } from './agentEditor.css';
 import { useAgentEditorHotkeys } from './agentEditor.hotkeys';
@@ -48,31 +49,31 @@ export const AgentEditor = observer(() => {
 
 	useEffect(() => {
 		const handleKeyDown = (event) => {
-			if (event.code === "Space") {
+			if (event.code === 'Space') {
 				setIsSpacePressed(true);
 			}
 		};
 
 		const handleKeyUp = (event) => {
-			if (event.code === "Space") {
+			if (event.code === 'Space') {
 				setIsSpacePressed(false);
 			}
 		};
 
-		document.addEventListener("keydown", handleKeyDown);
-		document.addEventListener("keyup", handleKeyUp);
+		document.addEventListener('keydown', handleKeyDown);
+		document.addEventListener('keyup', handleKeyUp);
 
 		return () => {
-			document.removeEventListener("keydown", handleKeyDown);
-			document.removeEventListener("keyup", handleKeyUp);
+			document.removeEventListener('keydown', handleKeyDown);
+			document.removeEventListener('keyup', handleKeyUp);
 		};
 	}, []);
 
 	useEffect(() => {
 		const handleClick = (e) => {
 			if (
-				e.target.closest(".prevent-selection-loss") ||
-				e.target.classList.contains("prevent-selection-loss")
+				e.target.closest('.prevent-selection-loss') ||
+				e.target.classList.contains('prevent-selection-loss')
 			) {
 				return;
 			}
@@ -80,33 +81,65 @@ export const AgentEditor = observer(() => {
 			// store.ui.setRightPanelOpen(undefined);
 		};
 
-		document.addEventListener("click", handleClick);
+		document.addEventListener('click', handleClick);
 		return () => {
-			document.removeEventListener("click", handleClick);
+			document.removeEventListener('click', handleClick);
 		};
 	}, []);
 
-	const nodesInitialized = useNodesInitialized();
+	// const nodesInitialized = useNodesInitialized();
 	const store = useStore();
 
 	const handleClick = useClickHandler(
-		"node-id",
+		'node-id',
 		(id, event) => {
 			store.agentEditor.selectNode(id);
 		},
 		[store]
 	);
 
-	useEffect(() => {
-		if (nodesInitialized) {
-			store.agentEditor.relayoutNodes();
-		}
-	}, [nodesInitialized, store]);
+	// useEffect(() => {
+	// 	if (nodesInitialized) {
+	// 		store.agentEditor.relayoutNodes();
+	// 	}
+	// }, [nodesInitialized, store]);
 
-	useAgentEditor(agentId ? parseInt(agentId) : undefined);
+	useAgentEditor(agentId);
 	useAgentEditorSpanner();
 
 	let state = rootStore.agentEditor;
+
+	const handleMouseMoved = useCallback((event: any) => {
+		let targetElement = event.target.classList.contains('rendered-node')
+			? event.target
+			: event.target.closest('.rendered-node');
+
+		if (targetElement) {
+			const rect = targetElement.getBoundingClientRect();
+			const centerX = rect.left + rect.width / 2;
+			let nodeId = targetElement.getAttribute('data-node-id');
+
+			if (event.clientX < centerX) {
+				store.agentEditor.setHoveredNode({
+					id: nodeId,
+					side: 'left',
+				});
+			} else {
+				store.agentEditor.setHoveredNode({
+					id: nodeId,
+					side: 'right',
+				});
+			}
+		} else {
+			store.agentEditor.setHoveredNode(undefined);
+		}
+	}, []);
+	useEffect(() => {
+		document.addEventListener('mousemove', handleMouseMoved);
+		return () => {
+			document.removeEventListener('mousemove', handleMouseMoved);
+		};
+	}, [handleMouseMoved]);
 
 	return (
 		<main className={AgentEditorStyle}>
@@ -137,6 +170,7 @@ export const AgentEditor = observer(() => {
 					e.stopPropagation();
 				}}
 				zoomOnScroll={false}
+				nodeClickDistance={50}
 				panOnScroll={true}
 				className={AgentEditorChartStyle}
 				panOnDrag={isSpacePressed}

@@ -1,14 +1,13 @@
 import { Text } from 'src/components/text';
 
-import { useAgentEditorNodeFormattedDetails, useNode } from './agentEditorNode.hooks';
+import { useAgentEditorNodeFormattedDetails, useNodeDetails } from './agentEditorNode.hooks';
 
 export const AgentEditorNodeFinalContents: React.FC<{
-	agentId: string;
 	nodeId: string;
-}> = ({ agentId, nodeId }) => {
-	const node = useNode(agentId, nodeId);
+}> = ({ nodeId }) => {
+	const details = useNodeDetails(nodeId);
 	const { formattedTitle, formattedDescription } =
-		useAgentEditorNodeFormattedDetails(node);
+		useAgentEditorNodeFormattedDetails(details);
 
 	return (
 		<div>

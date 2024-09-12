@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 
 export function useClickHandler(
 	attr: string,
-	cb: (attr: string, e: React.MouseEvent) => void,
+	cb: (attr: any, e: React.MouseEvent) => void,
 	deps: Array<any>
 ) {
 	const c = useCallback(

@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 
 import { useStore } from './useStore';
 
-export const useAgentEditor = (agentId?: number) => {
+export const useAgentEditor = (agentId?: string) => {
 	const store = useStore();
 
 	useEffect(() => {

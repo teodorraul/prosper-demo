@@ -1,16 +1,16 @@
 import {
     AENGlobalRowDescriptionStyle, AENGlobalRowStyle, AENGlobalRowTitleStyle
 } from './agentEditorGlobalNodeRow.css';
-import { useAgentEditorNodeFormattedDetails, useNode } from './agentEditorNode.hooks';
+import { useAgentEditorNodeFormattedDetails, useNodeDetails } from './agentEditorNode.hooks';
 
 export const AgentEditorGlobalNodeRow: React.FC<{
 	agentId: string;
 	nodeId: string;
 }> = ({ agentId, nodeId }) => {
-	const node = useNode(agentId, nodeId);
+	const details = useNodeDetails(agentId, nodeId);
 
 	const { formattedDescription, formattedTitle } =
-		useAgentEditorNodeFormattedDetails(node);
+		useAgentEditorNodeFormattedDetails(details);
 
 	return (
 		<li className={AENGlobalRowStyle}>

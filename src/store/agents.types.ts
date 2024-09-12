@@ -1,14 +1,15 @@
 import { observable } from 'mobx';
+import { v4 as uuid } from 'uuid';
 
 export class Agent {
-	id: number | undefined;
+	id: string;
 	@observable accessor createdAt: Date;
 	@observable accessor updatedAt: Date | undefined;
 	@observable accessor workflow: AgentWorkflow;
 
 	constructor(remote?: RemoteAgent) {
 		if (remote) {
-			this.id = remote.id;
+			this.id = `${remote.id}`;
 			this.createdAt = new Date(remote.created_at);
 			this.updatedAt = remote.updated_at
 				? new Date(remote.updated_at)
@@ -17,6 +18,7 @@ export class Agent {
 
 			console.log(this);
 		} else {
+			this.id = '';
 			this.createdAt = new Date();
 			this.workflow = new AgentWorkflow();
 		}
@@ -30,7 +32,7 @@ export class Agent {
 		};
 
 		if (this.id) {
-			payload.id = this.id;
+			payload.id = parseInt(this.id);
 		}
 
 		return payload;
@@ -81,13 +83,13 @@ export class AgentWorkflow {
 }
 
 export class AgentWorkflowEdge {
-	id: number;
+	id: string;
 	label: string | null;
 	readonly source: number;
 	readonly target: number;
 
 	constructor(remote: RemoteAgentEditorEdge) {
-		this.id = remote.id;
+		this.id = `${remote.id}`;
 		this.label = remote.label;
 		this.source = remote.source;
 		this.target = remote.target;
@@ -104,7 +106,7 @@ export class AgentWorkflowEdge {
 }
 
 export class AgentWorkflowNode {
-	id: number;
+	id: string;
 	readonly nodeEnterCondition: string;
 	readonly nodeName: string;
 	readonly nodeType: RemoteNodeType;
@@ -114,7 +116,7 @@ export class AgentWorkflowNode {
 
 	constructor(remote?: RemoteAgentEditorNode) {
 		if (remote) {
-			this.id = remote.id;
+			this.id = `${remote.id}`;
 			this.nodeEnterCondition = remote.node_enter_condition;
 			this.nodeName = remote.node_name;
 			this.nodeType = remote.node_type;
@@ -136,7 +138,7 @@ export class AgentWorkflowNode {
 		} else {
 			//teo
 			// should not happent
-			this.id = 0;
+			this.id = uuid();
 			this.nodeType = 'start_call';
 			this.nodeName = 'call_start';
 			this.prompt = '';
@@ -188,7 +190,7 @@ export class AgentEditorNodeUserData {
 // Remote Data
 
 export type RemoteAgent = {
-	id: number | undefined;
+	id?: number;
 	updated_at: string | undefined;
 	created_at: string;
 	data: {
@@ -199,14 +201,14 @@ export type RemoteAgent = {
 };
 
 export type RemoteAgentEditorEdge = {
-	id: number;
+	id: string;
 	label: string | null;
 	source: number;
 	target: number;
 };
 
 export type RemoteAgentEditorNode = {
-	id: number;
+	id: string;
 	node_enter_condition: string;
 	node_name: string;
 	node_type: RemoteNodeType;

@@ -27,7 +27,8 @@
       "checkJs": true,
       "esModuleInterop": true,
       "isolatedModules": true,
-      "experimentalDecorators": false
+      "experimentalDecorators": false,
+      "strict": true
     },
     "include": ["src/**/**/*"],
     "exclude": ["node_modules"]
