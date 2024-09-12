@@ -1,29 +1,43 @@
-import "@xyflow/react/dist/base.css";
+import '@xyflow/react/dist/base.css';
 
-import { observer } from "mobx-react";
-import { useEffect, useMemo, useState } from "react";
-import { Button } from "src/components/button";
-import { Logo } from "src/components/logo";
-import { useStore } from "src/store/useStore";
+import { observer } from 'mobx-react';
+import { useEffect, useMemo, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { Button } from 'src/components/button';
+import { Logo } from 'src/components/logo';
+import { useClickHandler } from 'src/hooks/useClickHandler';
+import { useAgentEditor } from 'src/store/agentEditor.hooks';
+import { useStore } from 'src/store/useStore';
 
-import { Background, BackgroundVariant, ReactFlow } from "@xyflow/react";
+import { Background, BackgroundVariant, ReactFlow, useNodesInitialized } from '@xyflow/react';
 
-import {
-	AgentEditorChartStyle,
-	AgentEditorHeader,
-	AgentEditorSidebar,
-	AgentEditorStyle,
-} from "./agentEditor.css";
-import { AgentEditorNodesStart } from "./agentEditorNodesStart";
+import { AgentEditorChartStyle, AgentEditorHeader, AgentEditorStyle } from './agentEditor.css';
+import { useAgentEditorHotkeys } from './agentEditor.hotkeys';
+import { useAgentEditorSpanner } from './agentEditor.spanner';
+import { AgentEditorEdge } from './agentEditorEdge';
+import { AgentEditorNode } from './agentEditorNode';
+import { AgentEditorSidebar } from './agentEditorSidebar';
 
 export const AgentEditor = observer(() => {
+	let { id: agentId } = useParams();
+	useAgentEditorHotkeys();
+
 	const nodeTypes = useMemo(
 		() => ({
-			start: (props) => (
-				<AgentEditorNodesStart {...props} draggable={false} />
+			start: (props) => <AgentEditorNode {...props} draggable={false} />,
+			node: (props) => <AgentEditorNode {...props} />,
+			end: (props) => <AgentEditorNode {...props} />,
+		}),
+		[]
+	);
+	const edgeTypes = useMemo(
+		() => ({
+			edge: (props) => (
+				<AgentEditorEdge
+					{...props}
+					className="prevent-selection-loss"
+				/>
 			),
-			node: (props) => <AgentEditorNodesStart {...props} />,
-			end: (props) => <AgentEditorNodesStart {...props} />,
 		}),
 		[]
 	);
@@ -72,8 +86,28 @@ export const AgentEditor = observer(() => {
 		};
 	}, []);
 
-	let store = rootStore.agentEditor;
-	let state = store.state;
+	const nodesInitialized = useNodesInitialized();
+	const store = useStore();
+
+	const handleClick = useClickHandler(
+		"node-id",
+		(id, event) => {
+			store.agentEditor.selectNode(id);
+		},
+		[store]
+	);
+
+	useEffect(() => {
+		if (nodesInitialized) {
+			store.agentEditor.relayoutNodes();
+		}
+	}, [nodesInitialized, store]);
+
+	useAgentEditor(agentId ? parseInt(agentId) : undefined);
+	useAgentEditorSpanner();
+
+	let state = rootStore.agentEditor;
+
 	return (
 		<main className={AgentEditorStyle}>
 			<div className={AgentEditorHeader}>
@@ -83,20 +117,17 @@ export const AgentEditor = observer(() => {
 			<ReactFlow
 				nodes={state.nodes}
 				edges={state.edges}
-				onViewportChange={store.handleViewportChange}
-				// edgeTypes={edgeTypes}
+				onViewportChange={state.handleViewportChange}
+				edgeTypes={edgeTypes}
 				nodeTypes={nodeTypes}
-				viewport={store.viewport}
-				// onNodesChange={store.chart.onNodesChange}
-				// onEdgesChange={store.chart.onEdgesChange}
+				viewport={state.viewport}
+				onNodesChange={state.onNodesChange}
+				onEdgesChange={state.onEdgesChange}
 				nodesFocusable
-				// onConnect={store.chart.onConnection}
-				// onlyRenderVisibleElements={true}
-				// proOptions={proOptions}
-				// fitViewOptions={initialZoomOption}
 				nodesDraggable={!isSpacePressed}
 				nodesConnectable={!isSpacePressed}
 				elementsSelectable={!isSpacePressed}
+				onClick={handleClick}
 				onEdgeDoubleClick={(e) => {
 					e.preventDefault();
 					e.stopPropagation();
@@ -110,6 +141,11 @@ export const AgentEditor = observer(() => {
 				className={AgentEditorChartStyle}
 				panOnDrag={isSpacePressed}
 				zoomOnDoubleClick={false}
+				fitView
+				fitViewOptions={{
+					minZoom: 1,
+					maxZoom: 1,
+				}}
 			>
 				<Background
 					id="1"
@@ -120,7 +156,7 @@ export const AgentEditor = observer(() => {
 					variant={BackgroundVariant.Dots}
 				/>
 			</ReactFlow>
-			<aside className={AgentEditorSidebar}></aside>
+			<AgentEditorSidebar />
 		</main>
 	);
 });

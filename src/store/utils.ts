@@ -34,3 +34,10 @@ export function sleep(ms: number) {
 }
 
 export const fakeID = () => Math.floor(Math.random() * 100000);
+
+export type FetchStatus = "initial" | "started" | "done" | "error";
+
+export type XYPosition = {
+	x: number;
+	y: number;
+};

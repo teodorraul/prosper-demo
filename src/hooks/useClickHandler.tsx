@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback } from 'react';
 
 export function useClickHandler(
 	attr: string,
@@ -6,15 +6,15 @@ export function useClickHandler(
 	deps: Array<any>
 ) {
 	const c = useCallback(
-		(e: any) => {
+		async (e: any) => {
 			let elem = e.target || e.currentTarget;
 
-			let elemAttribute = elem?.getAttribute("data-" + attr);
+			let elemAttribute = elem?.getAttribute('data-' + attr);
 			let closestAttribute = elem
 				?.closest(`[data-${attr}]`)
-				?.getAttribute("data-" + attr);
+				?.getAttribute('data-' + attr);
 
-			cb(elemAttribute || closestAttribute, e);
+			await cb(elemAttribute || closestAttribute, e);
 		},
 		[cb, ...deps]
 	);

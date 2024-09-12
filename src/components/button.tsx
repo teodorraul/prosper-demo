@@ -1,32 +1,46 @@
-import { HTMLAttributes, useCallback, useMemo, useState } from "react";
-import { Link, LinkProps } from "react-router-dom";
+import { HTMLAttributes, useCallback, useMemo, useState } from 'react';
+import { Link, LinkProps } from 'react-router-dom';
 
-import { RecipeVariants } from "@vanilla-extract/recipes";
+import { RecipeVariants } from '@vanilla-extract/recipes';
 
-import { ButtonStyle, LoaderMaskStyle, LoaderStyle } from "./button.css";
+import { ButtonStyle, LoaderMaskStyle, LoaderStyle } from './button.css';
 
 export const Button: React.FC<
 	{
 		title: String;
-		action?: () => void;
-		asyncAction?: () => void;
+		action?: (event: any) => void;
+		asyncAction?: (event: any) => void;
 		circle?: boolean;
 		to?: string;
+		center?: boolean;
 	} & RecipeVariants<typeof ButtonStyle>
-> = ({ title, to, type = "primary", action, asyncAction, circle }) => {
+> = ({
+	title,
+	to,
+	type = "primary",
+	center,
+	action,
+	asyncAction,
+	circle,
+	onClick,
+	...otherProps
+}) => {
 	const [isLoading, setIsLoading] = useState(false);
 
-	const handleClick = useCallback(async () => {
-		if (asyncAction) {
-			setIsLoading(true);
-			await asyncAction();
-			setIsLoading(false);
-		} else if (action) {
-			await action();
-		} else {
-			console.error("No action assigned to button");
-		}
-	}, [action]);
+	const handleClick = useCallback(
+		async (e) => {
+			if (asyncAction) {
+				setIsLoading(true);
+				await asyncAction(e);
+				setIsLoading(false);
+			} else if (action) {
+				await action(e);
+			} else {
+				console.error("No action assigned to button");
+			}
+		},
+		[action]
+	);
 
 	const { Tag, props } = useMemo(() => {
 		if (to) {
@@ -50,14 +64,16 @@ export const Button: React.FC<
 	return (
 		<Tag
 			onClick={handleClick}
+			{...otherProps}
 			className={ButtonStyle({
 				type: type,
+				align: center ? "center" : "normal",
 				shape: circle ? "circle" : "normal",
 			})}
 			{...props}
 		>
 			{isLoading && (
-				<div className={LoaderMaskStyle}>
+				<div className={LoaderMaskStyle({ type })}>
 					<div className={LoaderStyle} />
 				</div>
 			)}

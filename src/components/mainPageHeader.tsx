@@ -1,5 +1,7 @@
-import { ReactNode } from "react";
-import { MainPageHeaderStyle } from "./mainPageHeader.css";
+import { ReactNode } from 'react';
+
+import { MainPageHeaderStyle } from './mainPageHeader.css';
+import { Text } from './text';
 
 export const MainPageHeader: React.FC<{
 	title: string;
@@ -7,7 +9,7 @@ export const MainPageHeader: React.FC<{
 }> = ({ title, actions }) => {
 	return (
 		<header className={MainPageHeaderStyle}>
-			<h1>{title}</h1>
+			<Text level="title">{title}</Text>
 			<div>{actions}</div>
 		</header>
 	);

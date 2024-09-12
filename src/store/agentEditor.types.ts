@@ -1,15 +1,8 @@
-import { observable } from 'mobx';
-import { v4 as uuid } from 'uuid';
+import { Edge, Node } from '@xyflow/react';
 
-export class StartNode {
-    id = uuid()
-}
-
-export class EndNode {
-    id = uuid()
-}
-
-export class Node {
-    id = uuid()
-	@observable accessor prompt: string = "";
-}
+export type AEEdge = Edge<{}>;
+export type AENode = Node<{
+	// id: number;
+	// type: "node";
+	// position: XYPosition;
+}>;

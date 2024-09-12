@@ -22,6 +22,8 @@ export const Table: React.FC<{
 		return {
 			styles: {
 				gridTemplateColumns: layout,
+				marginLeft: -1 * columnGapSize,
+				marginRight: -1 * columnGapSize,
 			},
 			config: {
 				gap: columnGapSize,
@@ -81,7 +83,10 @@ export const TableRow: React.FC<{ children: any; to?: string }> = ({
 	);
 };
 
-export const TableCell: React.FC<{ children: any }> = ({ children }) => {
+export const TableCell: React.FC<{ children: any; oneLine?: boolean }> = ({
+	children,
+	oneLine = false,
+}) => {
 	const { config } = useTableConfig();
 
 	const style = useMemo<CSSProperties>(() => {
@@ -89,7 +94,12 @@ export const TableCell: React.FC<{ children: any }> = ({ children }) => {
 	}, [config]);
 
 	return (
-		<div className={TableCellStyle} style={style}>
+		<div
+			className={TableCellStyle({
+				layout: oneLine ? "oneLine" : "normal",
+			})}
+			style={style}
+		>
 			{children}
 		</div>
 	);

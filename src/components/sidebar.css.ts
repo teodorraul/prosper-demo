@@ -9,6 +9,7 @@ export const SidebarStyle = style({
 	display: "flex",
 	flexDirection: "column",
 	alignItems: "stretch",
+	flexShrink: 0,
 });
 
 export const LogoHolderStyle = style({
