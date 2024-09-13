@@ -145,7 +145,7 @@ export const AgentEditor = observer(() => {
 	return (
 		<main className={AgentEditorStyle}>
 			<div className={AgentEditorHeader}>
-				<Button title="←" circle type="subtle" to="/agents" />
+				<Button title="←" circle type="subtle" to="/zzz/prosp/agents" />
 				<Logo />
 			</div>
 			<ReactFlow

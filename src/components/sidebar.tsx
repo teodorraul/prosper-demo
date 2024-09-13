@@ -1,19 +1,16 @@
-import { Logo } from "./logo";
-import {
-	LogoHolderStyle,
-	SidebarLinkStyle,
-	SidebarNavStyle,
-	SidebarStyle,
-} from "./sidebar.css";
-import "../brand/globalStyles.css";
-import { Link, NavLink } from "react-router-dom";
+import '../brand/globalStyles.css';
+
+import { NavLink } from 'react-router-dom';
+
+import { Logo } from './logo';
+import { LogoHolderStyle, SidebarLinkStyle, SidebarNavStyle, SidebarStyle } from './sidebar.css';
 
 const routes = [
 	{
-		path: "/agents",
-		name: "🧑‍💼 Agents",
+		path: '/zzz/prosp/agents',
+		name: '🧑‍💼 Agents',
 	},
-	{ path: "another-page", name: "Another page (TBD)" },
+	{ path: 'another-page', name: 'Another page (TBD)' },
 ];
 export const Sidebar = () => {
 	return (
