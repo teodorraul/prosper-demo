@@ -11,33 +11,33 @@ import { RouteAgents } from './routes/agents';
 import { AnotherPage } from './routes/another-page';
 import Store from './store/root.store';
 
-const rootElement = document.querySelector("#root");
-if (!rootElement) throw new Error("Failed to find the root element");
+const rootElement = document.querySelector('#root');
+if (!rootElement) throw new Error('Failed to find the root element');
 
-const AgentsIdRoute = lazy(() => import("./routes/agents.id"));
+const AgentsIdRoute = lazy(() => import('./routes/agents.id'));
 const root = createRoot(rootElement);
 
 const router = createBrowserRouter([
 	{
-		path: "/",
+		path: '/zzz/prosp',
 		element: <IndexRoutesContainer />,
 		children: [
 			{
-				path: "/",
-				element: <Navigate to="/agents" />,
+				path: '',
+				element: <Navigate to="/zzz/prosp/agents" />,
 			},
 			{
-				path: "/agents",
+				path: 'agents',
 				element: <RouteAgents />,
 			},
 			{
-				path: "/another-page",
+				path: 'another-page',
 				element: <AnotherPage />,
 			},
 		],
 	},
 	{
-		path: "/agents/:id",
+		path: '/zzz/prosp/agents/:id',
 		//teo
 		element: (
 			<Suspense fallback={<LoadingScreen />}>

@@ -1,0 +1,1205 @@
+/* this will be exported as base.css and can be used for a basic styling */
+/* these are the necessary styles for React/Svelte Flow, they get used by base.css and style.css */
+.react-flow {
+  direction: ltr;
+
+  --xy-edge-stroke-default: #b1b1b7;
+  --xy-edge-stroke-width-default: 1;
+  --xy-edge-stroke-selected-default: #555;
+
+  --xy-connectionline-stroke-default: #b1b1b7;
+  --xy-connectionline-stroke-width-default: 1;
+
+  --xy-attribution-background-color-default: rgba(255, 255, 255, 0.5);
+
+  --xy-minimap-background-color-default: #fff;
+  --xy-minimap-mask-background-color-default: rgb(240, 240, 240, 0.6);
+  --xy-minimap-mask-stroke-color-default: transparent;
+  --xy-minimap-mask-stroke-width-default: 1;
+  --xy-minimap-node-background-color-default: #e2e2e2;
+  --xy-minimap-node-stroke-color-default: transparent;
+  --xy-minimap-node-stroke-width-default: 2;
+
+  --xy-background-color-default: transparent;
+  --xy-background-pattern-dots-color-default: #91919a;
+  --xy-background-pattern-lines-color-default: #eee;
+  --xy-background-pattern-cross-color-default: #e2e2e2;
+  background-color: var(--xy-background-color, var(--xy-background-color-default));
+  --xy-node-border-default: 1px solid #bbb;
+  --xy-node-border-selected-default: 1px solid #555;
+
+  --xy-handle-background-color-default: #333;
+
+  --xy-selection-background-color-default: rgba(150, 150, 180, 0.1);
+  --xy-selection-border-default: 1px dotted rgba(155, 155, 155, 0.8);
+  --xy-resize-background-color-default: #3367d9;
+}
+.react-flow.dark {
+  --xy-edge-stroke-default: #3e3e3e;
+  --xy-edge-stroke-width-default: 1;
+  --xy-edge-stroke-selected-default: #727272;
+
+  --xy-connectionline-stroke-default: #b1b1b7;
+  --xy-connectionline-stroke-width-default: 1;
+
+  --xy-attribution-background-color-default: rgba(150, 150, 150, 0.25);
+
+  --xy-minimap-background-color-default: #141414;
+  --xy-minimap-mask-background-color-default: rgb(60, 60, 60, 0.6);
+  --xy-minimap-mask-stroke-color-default: transparent;
+  --xy-minimap-mask-stroke-width-default: 1;
+  --xy-minimap-node-background-color-default: #2b2b2b;
+  --xy-minimap-node-stroke-color-default: transparent;
+  --xy-minimap-node-stroke-width-default: 2;
+
+  --xy-background-color-default: #141414;
+  --xy-background-pattern-dots-color-default: #777;
+  --xy-background-pattern-lines-color-default: #777;
+  --xy-background-pattern-cross-color-default: #777;
+  --xy-node-color-default: #f8f8f8;
+}
+.react-flow__background {
+  background-color: var(--xy-background-color, var(--xy-background-color-props, var(--xy-background-color-default)));
+  pointer-events: none;
+  z-index: -1;
+}
+.react-flow__container {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+}
+.react-flow__pane {
+  z-index: 1;
+}
+.react-flow__pane.draggable {
+    cursor: -webkit-grab;
+    cursor: grab;
+  }
+.react-flow__pane.dragging {
+    cursor: -webkit-grabbing;
+    cursor: grabbing;
+  }
+.react-flow__pane.selection {
+    cursor: pointer;
+  }
+.react-flow__viewport {
+  -webkit-transform-origin: 0 0;
+          transform-origin: 0 0;
+  z-index: 2;
+  pointer-events: none;
+}
+.react-flow__renderer {
+  z-index: 4;
+}
+.react-flow__selection {
+  z-index: 6;
+}
+.react-flow__nodesselection-rect:focus,
+.react-flow__nodesselection-rect:focus-visible {
+  outline: none;
+}
+.react-flow__edge-path {
+  stroke: var(--xy-edge-stroke, var(--xy-edge-stroke-default));
+  stroke-width: var(--xy-edge-stroke-width, var(--xy-edge-stroke-width-default));
+  fill: none;
+}
+.react-flow__connection-path {
+  stroke: var(--xy-connectionline-stroke, var(--xy-connectionline-stroke-default));
+  stroke-width: var(--xy-connectionline-stroke-width, var(--xy-connectionline-stroke-width-default));
+  fill: none;
+}
+.react-flow .react-flow__edges {
+  position: absolute;
+}
+.react-flow .react-flow__edges svg {
+    overflow: visible;
+    position: absolute;
+    pointer-events: none;
+  }
+.react-flow__edge {
+  pointer-events: visibleStroke;
+}
+.react-flow__edge.selectable {
+    cursor: pointer;
+  }
+.react-flow__edge.animated path {
+    stroke-dasharray: 5;
+    -webkit-animation: dashdraw 0.5s linear infinite;
+            animation: dashdraw 0.5s linear infinite;
+  }
+.react-flow__edge.animated path.react-flow__edge-interaction {
+    stroke-dasharray: none;
+    -webkit-animation: none;
+            animation: none;
+  }
+.react-flow__edge.inactive {
+    pointer-events: none;
+  }
+.react-flow__edge.selected,
+  .react-flow__edge:focus,
+  .react-flow__edge:focus-visible {
+    outline: none;
+  }
+.react-flow__edge.selected .react-flow__edge-path,
+  .react-flow__edge.selectable:focus .react-flow__edge-path,
+  .react-flow__edge.selectable:focus-visible .react-flow__edge-path {
+    stroke: var(--xy-edge-stroke-selected, var(--xy-edge-stroke-selected-default));
+  }
+.react-flow__edge-textwrapper {
+    pointer-events: all;
+  }
+.react-flow__edge .react-flow__edge-text {
+    pointer-events: none;
+    -webkit-user-select: none;
+       -moz-user-select: none;
+            -ms-user-select: none;
+        user-select: none;
+  }
+.react-flow__connection {
+  pointer-events: none;
+}
+.react-flow__connection .animated {
+    stroke-dasharray: 5;
+    -webkit-animation: dashdraw 0.5s linear infinite;
+            animation: dashdraw 0.5s linear infinite;
+  }
+svg.react-flow__connectionline {
+  z-index: 1001;
+  overflow: visible;
+  position: absolute;
+}
+.react-flow__nodes {
+  pointer-events: none;
+  -webkit-transform-origin: 0 0;
+          transform-origin: 0 0;
+}
+.react-flow__node {
+  position: absolute;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          -ms-user-select: none;
+      user-select: none;
+  pointer-events: all;
+  -webkit-transform-origin: 0 0;
+          transform-origin: 0 0;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+  cursor: default;
+}
+.react-flow__node.selectable {
+    cursor: pointer;
+  }
+.react-flow__node.draggable {
+    cursor: -webkit-grab;
+    cursor: grab;
+    pointer-events: all;
+  }
+.react-flow__node.draggable.dragging {
+      cursor: -webkit-grabbing;
+      cursor: grabbing;
+    }
+.react-flow__nodesselection {
+  z-index: 3;
+  -webkit-transform-origin: left top;
+          transform-origin: left top;
+  pointer-events: none;
+}
+.react-flow__nodesselection-rect {
+    position: absolute;
+    pointer-events: all;
+    cursor: -webkit-grab;
+    cursor: grab;
+  }
+.react-flow__handle {
+  position: absolute;
+  pointer-events: none;
+  min-width: 5px;
+  min-height: 5px;
+  background-color: var(--xy-handle-background-color, var(--xy-handle-background-color-default));
+}
+.react-flow__handle.connectingfrom {
+    pointer-events: all;
+  }
+.react-flow__handle.connectionindicator {
+    pointer-events: all;
+    cursor: crosshair;
+  }
+.react-flow__handle-bottom {
+    top: auto;
+    left: 50%;
+    bottom: 0;
+    -webkit-transform: translate(-50%, 50%);
+            transform: translate(-50%, 50%);
+  }
+.react-flow__handle-top {
+    top: 0;
+    left: 50%;
+    -webkit-transform: translate(-50%, -50%);
+            transform: translate(-50%, -50%);
+  }
+.react-flow__handle-left {
+    top: 50%;
+    left: 0;
+    -webkit-transform: translate(-50%, -50%);
+            transform: translate(-50%, -50%);
+  }
+.react-flow__handle-right {
+    top: 50%;
+    right: 0;
+    -webkit-transform: translate(50%, -50%);
+            transform: translate(50%, -50%);
+  }
+.react-flow__edgeupdater {
+  cursor: move;
+  pointer-events: all;
+}
+.react-flow__panel {
+  position: absolute;
+  z-index: 5;
+  margin: 15px;
+}
+.react-flow__panel.top {
+    top: 0;
+  }
+.react-flow__panel.bottom {
+    bottom: 0;
+  }
+.react-flow__panel.left {
+    left: 0;
+  }
+.react-flow__panel.right {
+    right: 0;
+  }
+.react-flow__panel.center {
+    left: 50%;
+    -webkit-transform: translateX(-50%);
+            transform: translateX(-50%);
+  }
+.react-flow__attribution {
+  font-size: 10px;
+  background: var(--xy-attribution-background-color, var(--xy-attribution-background-color-default));
+  padding: 2px 3px;
+  margin: 0;
+}
+.react-flow__attribution a {
+    text-decoration: none;
+    color: #999;
+  }
+@-webkit-keyframes dashdraw {
+  from {
+    stroke-dashoffset: 10;
+  }
+}
+@keyframes dashdraw {
+  from {
+    stroke-dashoffset: 10;
+  }
+}
+.react-flow__edgelabel-renderer {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          -ms-user-select: none;
+      user-select: none;
+  left: 0;
+  top: 0;
+}
+.react-flow__viewport-portal {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          -ms-user-select: none;
+      user-select: none;
+}
+.react-flow__minimap {
+  background: var(
+    --xy-minimap-background-color-props,
+    var(--xy-minimap-background-color, var(--xy-minimap-background-color-default))
+  );
+}
+.react-flow__minimap-svg {
+    display: block;
+  }
+.react-flow__minimap-mask {
+    fill: var(
+      --xy-minimap-mask-background-color-props,
+      var(--xy-minimap-mask-background-color, var(--xy-minimap-mask-background-color-default))
+    );
+    stroke: var(
+      --xy-minimap-mask-stroke-color-props,
+      var(--xy-minimap-mask-stroke-color, var(--xy-minimap-mask-stroke-color-default))
+    );
+    stroke-width: var(
+      --xy-minimap-mask-stroke-width-props,
+      var(--xy-minimap-mask-stroke-width, var(--xy-minimap-mask-stroke-width-default))
+    );
+  }
+.react-flow__minimap-node {
+    fill: var(
+      --xy-minimap-node-background-color-props,
+      var(--xy-minimap-node-background-color, var(--xy-minimap-node-background-color-default))
+    );
+    stroke: var(
+      --xy-minimap-node-stroke-color-props,
+      var(--xy-minimap-node-stroke-color, var(--xy-minimap-node-stroke-color-default))
+    );
+    stroke-width: var(
+      --xy-minimap-node-stroke-width-props,
+      var(--xy-minimap-node-stroke-width, var(--xy-minimap-node-stroke-width-default))
+    );
+  }
+.react-flow__background-pattern.dots {
+    fill: var(
+      --xy-background-pattern-color-props,
+      var(--xy-background-pattern-color, var(--xy-background-pattern-dots-color-default))
+    );
+  }
+.react-flow__background-pattern.lines {
+    stroke: var(
+      --xy-background-pattern-color-props,
+      var(--xy-background-pattern-color, var(--xy-background-pattern-lines-color-default))
+    );
+  }
+.react-flow__background-pattern.cross {
+    stroke: var(
+      --xy-background-pattern-color-props,
+      var(--xy-background-pattern-color, var(--xy-background-pattern-cross-color-default))
+    );
+  }
+.react-flow__controls {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+}
+.react-flow__controls.horizontal {
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+        -ms-flex-direction: row;
+            flex-direction: row;
+  }
+.react-flow__controls-button {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: center;
+        -ms-flex-pack: center;
+            justify-content: center;
+    -webkit-box-align: center;
+        -ms-flex-align: center;
+            align-items: center;
+    height: 26px;
+    width: 26px;
+    padding: 4px;
+  }
+.react-flow__controls-button svg {
+      width: 100%;
+      max-width: 12px;
+      max-height: 12px;
+      fill: currentColor;
+    }
+.react-flow__node-input,
+.react-flow__node-default,
+.react-flow__node-output,
+.react-flow__node-group {
+  border: var(--xy-node-border, var(--xy-node-border-default));
+  color: var(--xy-node-color, var(--xy-node-color-default));
+}
+.react-flow__node-input.selected,
+  .react-flow__node-input:focus,
+  .react-flow__node-input:focus-visible,
+  .react-flow__node-default.selected,
+  .react-flow__node-default:focus,
+  .react-flow__node-default:focus-visible,
+  .react-flow__node-output.selected,
+  .react-flow__node-output:focus,
+  .react-flow__node-output:focus-visible,
+  .react-flow__node-group.selected,
+  .react-flow__node-group:focus,
+  .react-flow__node-group:focus-visible {
+    outline: none;
+    border: var(--xy-node-border-selected, var(--xy-node-border-selected-default));
+  }
+.react-flow__nodesselection-rect,
+.react-flow__selection {
+  background: var(--xy-selection-background-color, var(--xy-selection-background-color-default));
+  border: var(--xy-selection-border, var(--xy-selection-border-default));
+}
+.react-flow__resize-control {
+  position: absolute;
+}
+.react-flow__resize-control.left,
+.react-flow__resize-control.right {
+  cursor: ew-resize;
+}
+.react-flow__resize-control.top,
+.react-flow__resize-control.bottom {
+  cursor: ns-resize;
+}
+.react-flow__resize-control.top.left,
+.react-flow__resize-control.bottom.right {
+  cursor: nwse-resize;
+}
+.react-flow__resize-control.bottom.left,
+.react-flow__resize-control.top.right {
+  cursor: nesw-resize;
+}
+/* handle styles */
+.react-flow__resize-control.handle {
+  width: 4px;
+  height: 4px;
+  border: 1px solid #fff;
+  border-radius: 1px;
+  background-color: var(--xy-resize-background-color, var(--xy-resize-background-color-default));
+  -webkit-transform: translate(-50%, -50%);
+          transform: translate(-50%, -50%);
+}
+.react-flow__resize-control.handle.left {
+  left: 0;
+  top: 50%;
+}
+.react-flow__resize-control.handle.right {
+  left: 100%;
+  top: 50%;
+}
+.react-flow__resize-control.handle.top {
+  left: 50%;
+  top: 0;
+}
+.react-flow__resize-control.handle.bottom {
+  left: 50%;
+  top: 100%;
+}
+.react-flow__resize-control.handle.top.left {
+  left: 0;
+}
+.react-flow__resize-control.handle.bottom.left {
+  left: 0;
+}
+.react-flow__resize-control.handle.top.right {
+  left: 100%;
+}
+.react-flow__resize-control.handle.bottom.right {
+  left: 100%;
+}
+/* line styles */
+.react-flow__resize-control.line {
+  border-color: var(--xy-resize-background-color, var(--xy-resize-background-color-default));
+  border-width: 0;
+  border-style: solid;
+}
+.react-flow__resize-control.line.left,
+.react-flow__resize-control.line.right {
+  width: 1px;
+  -webkit-transform: translate(-50%, 0);
+          transform: translate(-50%, 0);
+  top: 0;
+  height: 100%;
+}
+.react-flow__resize-control.line.left {
+  left: 0;
+  border-left-width: 1px;
+}
+.react-flow__resize-control.line.right {
+  left: 100%;
+  border-right-width: 1px;
+}
+.react-flow__resize-control.line.top,
+.react-flow__resize-control.line.bottom {
+  height: 1px;
+  -webkit-transform: translate(0, -50%);
+          transform: translate(0, -50%);
+  left: 0;
+  width: 100%;
+}
+.react-flow__resize-control.line.top {
+  top: 0;
+  border-top-width: 1px;
+}
+.react-flow__resize-control.line.bottom {
+  border-bottom-width: 1px;
+  top: 100%;
+}
+
+._1mh5klk0 {
+  background {
+    t2: #FFFF;
+    t1: #F0F0F0;
+    r: #E7ECED;
+    s1: #D1E1E4;
+    s2: #B4D6DD;
+  }
+}
+._1mh5klk1 {
+  width: 100vw;
+  height: 100vh;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: row;
+          flex-direction: row;
+}
+._1mh5klk2 {
+  position: fixed;
+  left: 15px;
+  top: 15px;
+  padding: 8px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  z-index: 1000;
+  border-radius: 15px;
+  -webkit-backdrop-filter: blur(7px);
+          backdrop-filter: blur(7px);
+  background-color: rgba(255,255,255,0.7);
+  -webkit-box-shadow: 0px 0px 0px 0.5px inset rgba(20,35,50,0.33), 0 1px 3px rgba(20,30,40,0.1);
+          box-shadow: 0px 0px 0px 0.5px inset rgba(20,35,50,0.33), 0 1px 3px rgba(20,30,40,0.1);
+}
+._1mh5klk2 .logo {
+  height: 27px;
+  margin-left: 4px;
+}
+._8jra300 {
+  position: relative;
+  color: #141414;
+  cursor: pointer;
+}
+._8jra301 {
+  padding: 20px;
+  background-color: white;
+  border-radius: 14px;
+  -webkit-box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.16), 0 10px 10px -5px rgba(0, 0, 0, 0.08);
+          box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.16), 0 10px 10px -5px rgba(0, 0, 0, 0.08);
+  -webkit-transition: 0.3s ease box-shadow;
+  transition: 0.3s ease box-shadow;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-align: stretch;
+      -ms-flex-align: stretch;
+          align-items: stretch;
+  max-width: 270px;
+  width: 100vw;
+}
+._8jra302 {
+  -webkit-box-shadow: 0 6px 25px -5px rgba(10, 20, 30, 0.35), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+          box-shadow: 0 6px 25px -5px rgba(10, 20, 30, 0.35), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+._8jra303 {
+  -webkit-box-shadow: 0 5px 5px -5px rgba(0, 0, 0, 0.1), 0 1px 3px 0px rgba(0, 0, 0, 0.1);
+          box-shadow: 0 5px 5px -5px rgba(0, 0, 0, 0.1), 0 1px 3px 0px rgba(0, 0, 0, 0.1);
+}
+._8jra304 {
+  display: grid;
+  grid-template-columns: -webkit-min-content 1fr;
+  grid-template-columns: min-content 1fr;
+  -webkit-column-gap: 12px;
+     -moz-column-gap: 12px;
+          column-gap: 12px;
+  -webkit-box-align: start;
+      -ms-flex-align: start;
+          align-items: flex-start;
+  margin-top: 12px;
+}
+._8jra305 {
+  position: absolute;
+  top: -10px;
+  left: -10px;
+  height: calc(100% + 20px);
+  width: calc(100% + 20px);
+  border-color: rgba(0,0,0,0.2);
+  background: #D1E1E4;
+  border-width: 2px;
+  border-style: solid;
+  border-radius: calc(16px + 8px);
+  z-index: -10;
+}
+._8jra306 {
+  display: block;
+}
+._8jra307 {
+  display: none;
+}
+.chno9g0 {
+  position: absolute;
+  bottom: 0;
+  -webkit-transform: translateY(100%);
+          transform: translateY(100%);
+  left: -15%;
+  height: 100px;
+  width: 130%;
+  z-index: -1;
+}
+.chno9g1 {
+  position: absolute;
+  height: 70px;
+  left: 50%;
+  width: 180px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  margin-left: -90px;
+  top: 0;
+}
+.chno9g1:before {
+  content: "";
+  top: -10px;
+  left: 50%;
+  width: 1px;
+  display: block;
+  position: absolute;
+  margin-left: -0.5px;
+  height: 40px;
+  background-color: #ccc;
+}
+.chno9g2 {
+  position: absolute;
+  height: 100%;
+  left: 0%;
+  width: 50%;
+}
+.chno9g2:before {
+  content: "";
+  position: absolute;
+  top: 0;
+  display: block;
+  width: 30px;
+  height: 25px;
+  border-bottom: 1px solid #ccc;
+  right: 105px;
+  border-right: 1px solid #ccc;
+  border-bottom-right-radius: 14px;
+}
+.chno9g3 {
+  width: 80px;
+  height: 30px;
+  border-radius: 7px;
+  background: linear-gradient(176deg, rgba(255,255,255,1) 0%, rgba(216,224,227,1) 100%);
+  -webkit-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.1);
+          box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.1);
+  color: #626262;
+  font-size: 12px;
+  padding: 0;
+  padding-top: 2px;
+}
+.chno9g3:hover {
+  color: #141414;
+  background: linear-gradient(176deg, rgba(240,240,240,1) 0%, rgba(204,211,214,1) 100%);
+}
+.chno9g3:active {
+  color: #141414;
+  background: linear-gradient(176deg, rgba(233,233,233,1) 0%, rgba(191,199,202,1) 100%);
+}
+.chno9g4 {
+  position: absolute;
+  height: 100%;
+  left: 50%;
+  width: 50%;
+}
+.chno9g4:before {
+  content: "";
+  position: absolute;
+  top: 0;
+  display: block;
+  width: 30px;
+  height: 25px;
+  border-bottom: 1px solid #ccc;
+  left: 105px;
+  border-left: 1px solid #ccc;
+  border-bottom-left-radius: 14px;
+}
+.chno9g5 {
+  position: absolute;
+}
+.chno9g4 .chno9g5 {
+  left: 135px;
+  top: 10px;
+}
+.chno9g2 .chno9g5 {
+  right: 135px;
+  top: 10px;
+}
+.t3zkrt0 {
+  margin-top: 8px;
+  color: #626262;
+  background-color: rgba(10,20,30,0.05);
+  border-radius: 7px;
+  padding: 10px;
+  margin: 15px -10px -10px -10px;
+}
+.t3zkrt1 {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+.t3zkrt2 {
+  width: 16px;
+  -webkit-box-shadow: 0px 0px 0px 0.5px inset rgba(20,35,50,0.25);
+          box-shadow: 0px 0px 0px 0.5px inset rgba(20,35,50,0.25);
+  height: 16px;
+  border-radius: 4px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  background-color: #AEFFC5;
+  color: #288C44;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  font-family: monospace;
+  font-size: 12px;
+}
+.t3zkrt3 {
+  margin-top: 8px;
+  margin-right: 10px;
+}
+.t3zkrt4 {
+  margin-top: 8px;
+  color: #343434;
+  font-size: 12px;
+  line-height: 1em;
+}
+._1bcdjcw0 {
+  padding: 3px 5px;
+  margin-top: 1px;
+  background-color: rgba(0,0,0,0.05);
+  border-radius: 8px;
+  font-family: monospace;
+  margin-left: -5px;
+  font-size: 10px;
+  font-weight: bold;
+  line-height: 1em;
+}
+._151js6v0 {
+  width: 24px;
+  height: 24px;
+  -ms-flex-item-align: center;
+      align-self: center;
+}
+._151js6v1 {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: stretch;
+      -ms-flex-align: stretch;
+          align-items: stretch;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  text-align: center;
+  row-gap: 5px;
+}
+._151js6v2 {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  row-gap: 5px;
+}
+._4c8h6s0 {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-align: stretch;
+      -ms-flex-align: stretch;
+          align-items: stretch;
+  padding: 0;
+  margin: 0;
+  margin-bottom: 20px;
+}
+._4c8h6s1 {
+  font-size: 11px;
+  text-transform: uppercase;
+  opacity: 0.4;
+  margin: 0;
+  margin-top: 15px;
+  margin-bottom: 10px;
+}
+._4c8h6s2 {
+  width: 22px;
+  height: 22px;
+  color: #E85232;
+}
+._4c8h6s3 {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: stretch;
+      -ms-flex-align: stretch;
+          align-items: stretch;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+}
+._4c8h6s4 {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-column-gap: 12px;
+     -moz-column-gap: 12px;
+          column-gap: 12px;
+  margin-bottom: 10px;
+}
+._16xqro30 {
+  width: 50vw;
+  max-width: 500px;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  right: 0;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+}
+._16xqro31 {
+  margin: 20px;
+  padding: 25px 35px;
+  padding-bottom: 17px;
+  border-radius: 20px;
+  will-change: transform;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-align: stretch;
+      -ms-flex-align: stretch;
+          align-items: stretch;
+  row-gap: 10px;
+  -webkit-box-flex: 1;
+      -ms-flex-positive: 1;
+          flex-grow: 1;
+  overflow: scroll;
+  -webkit-backdrop-filter: blur(7px);
+          backdrop-filter: blur(7px);
+  background-color: rgba(217,229,232, 0.85);
+  -webkit-box-shadow: 0px 0px 0px 0.5px inset rgba(20,35,50,0.33), 0 15px 30px -10px rgba(40,50,60,0.6);
+          box-shadow: 0px 0px 0px 0.5px inset rgba(20,35,50,0.33), 0 15px 30px -10px rgba(40,50,60,0.6);
+}
+._16xqro32 {
+  font-size: 43px;
+  font-family: "qsbjmo0";
+  letter-spacing: -0.75px;
+  line-height: 1.1em;
+  margin: 5px;
+  margin-bottom: 12px;
+  color: #141414;
+}
+._16xqro33 {
+  background-color: white;
+  padding: 16px 20px 12px 20px;
+  text-transform: uppercase;
+  border-radius: 16px;
+  -webkit-box-shadow: 0px 2px 3px rgba(10,20,30,0.1), 0px 1px 2px 1px rgba(10,20,30,0.1);
+          box-shadow: 0px 2px 3px rgba(10,20,30,0.1), 0px 1px 2px 1px rgba(10,20,30,0.1);
+  -ms-flex-item-align: stretch;
+      align-self: stretch;
+}
+._16xqro34 {
+  padding: 3px 5px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-align: start;
+      -ms-flex-align: start;
+          align-items: flex-start;
+  row-gap: 8px;
+}
+.i9xonl0 {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  width: 16px;
+  height: 16px;
+  background-color: rgba(0,0,0,0.1);
+  color: #141414;
+  border-radius: 999px;
+  cursor: pointer;
+  margin-top: 6px;
+  margin-left: 5px;
+}
+.i9xonl0:hover {
+  background: rgba(0,0,0,0.2);
+}
+.i9xonl0:active {
+  background: rgba(0,0,0,0.3);
+}
+.i9xonl1 {
+  width: 7px;
+  height: 7px;
+}
+._839l990 {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: stretch;
+      -ms-flex-align: stretch;
+          align-items: stretch;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  margin-top: 15px;
+  margin-left: -5px;
+}
+._839l991 {
+  display: grid;
+  grid-template-columns: -webkit-min-content auto -webkit-min-content;
+  grid-template-columns: min-content auto min-content;
+  row-gap: 5px;
+  -webkit-column-gap: 5px;
+     -moz-column-gap: 5px;
+          column-gap: 5px;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+  padding: 5px 0;
+}
+._839l991:last-child {
+  border-bottom: none;
+}
+._839l992 {
+  display: block;
+  -webkit-box-flex: 1;
+      -ms-flex-positive: 1;
+          flex-grow: 1;
+}
+._839l993 {
+  display: block;
+  -webkit-box-flex: 0;
+      -ms-flex-positive: 0;
+          flex-grow: 0;
+}
+._839l994 {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-flex: 1;
+      -ms-flex-positive: 1;
+          flex-grow: 1;
+  margin-top: 20px;
+}
+._1oq1udv0 {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: row;
+          flex-direction: row;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  padding: 3px 6px;
+  border-radius: 8px;
+  -webkit-box-flex: 1;
+      -ms-flex-positive: 1;
+          flex-grow: 1;
+}
+._1oq1udv0:hover {
+  background: rgba(0,0,0,0.05);
+  cursor: pointer;
+}
+._1oq1udv0:active {
+  background: rgba(0,0,0,0.1);
+  cursor: pointer;
+}
+._1oq1udv1 {
+  margin-right: 5px;
+}
+._1oq1udv2 {
+  width: 8px;
+  margin-left: 5px;
+  opacity: 0.3;
+}
+._1oq1udv0:hover ._1oq1udv2 {
+  opacity: 1;
+}
+@-webkit-keyframes _1osctke8 {
+  0% {
+    opacity: 1;
+  }
+  20% {
+    opacity: 1;
+  }
+  43% {
+    opacity: 0.33;
+  }
+  50% {
+    opacity: 0.33;
+  }
+  60% {
+    opacity: 0.33;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+@keyframes _1osctke8 {
+  0% {
+    opacity: 1;
+  }
+  20% {
+    opacity: 1;
+  }
+  43% {
+    opacity: 0.33;
+  }
+  50% {
+    opacity: 0.33;
+  }
+  60% {
+    opacity: 0.33;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+._1osctke0 {
+  margin: 0;
+  padding: 0;
+  border: none;
+  width: 100%;
+  font-size: 13px;
+  font-family: "qsbjmo1";
+  background-color: transparent;
+  padding-bottom: 10px;
+  resize: vertical;
+  line-height: 1.5em;
+}
+._1osctke2 {
+  border-radius: 8px;
+  padding: 8px 15px;
+}
+._1osctke2:hover {
+  background: rgba(0,0,0,0.05);
+}
+._1osctke2:active {
+  background: rgba(0,0,0,0.1);
+}
+._1osctke2:focus {
+  background: rgba(0,0,0,0.1);
+}
+._1osctke4 {
+  margin: 0;
+  padding: 7px 0;
+  border: none;
+  width: 100%;
+  font-size: 13px;
+  background-color: transparent;
+  font-family: "qsbjmo1";
+  line-height: 1em;
+}
+._1osctke6 {
+  border-radius: 8px;
+  padding: 8px 15px;
+  font-weight: bold;
+  background: rgba(0,0,0,0.05);
+}
+._1osctke6:hover {
+  background: rgba(0,0,0,0.1);
+}
+._1osctke6:active {
+  background: rgba(0,0,0,0.1);
+}
+._1osctke6:focus {
+  background: rgba(0,0,0,0.1);
+}
+._1osctke9 {
+  position: relative;
+}
+.tbfeq90 {
+  font-family: monospace;
+  font-weight: bold;
+  letter-spacing: -0.2px;
+}
+.tbfeq91 {
+  min-height: 80px;
+  margin-top: 10px;
+}
+._2o1gyb0 {
+  min-height: 160px;
+}
+._1tza3990 {
+  padding: 5px 12px;
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  border-radius: 10px;
+  color: white;
+  background-color: #141414;
+  -webkit-box-shadow: 0px 0px 0px 0.5px inset rgba(20,35,50,0.33), 0 1px 3px rgba(20,30,40,0.1);
+          box-shadow: 0px 0px 0px 0.5px inset rgba(20,35,50,0.33), 0 1px 3px rgba(20,30,40,0.1);
+}

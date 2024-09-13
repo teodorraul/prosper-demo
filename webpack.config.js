@@ -5,14 +5,13 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const webpack = require('webpack');
 const CopyPlugin = require('copy-webpack-plugin');
 
-console.log(process.env.SUPABASE_URL.length);
 module.exports = {
 	entry: './src/index.tsx',
 	mode: 'development',
 	output: {
 		filename: 'bundle.[fullhash].js',
 		path: path.resolve(__dirname, 'dist'),
-		publicPath: '/',
+		publicPath: process.env.IS_DEVELOPMENT ? '/' : '/zzz/prosp/',
 	},
 	devServer: {
 		historyApiFallback: true,
@@ -61,14 +60,15 @@ module.exports = {
 						options: {
 							url: false,
 						},
-					},{
+					},
+					{
 						loader: 'postcss-loader',
 						options: {
-						  postcssOptions: {
-							config: './postcss.config.js',
-						  },
+							postcssOptions: {
+								config: './postcss.config.js',
+							},
 						},
-					  },
+					},
 				],
 			},
 		],
