@@ -35,7 +35,11 @@ export type EditorAction =
 	| {
 			type: 'remove-node';
 			nodeId: string;
-	  };
+	  }
+	  | {
+			  type: 'prompt-updated';
+			  value: string | undefined
+		};
 
 export type HoveredNode = {
 	id: string;
@@ -52,6 +56,11 @@ export type SyncOperation =
 	| {
 			operation: 'delete-node';
 			id: string;
-	  };
+	  }
+	| {
+			operation: 'update-prompt';
+			prompt: string | undefined
+			id: string
+	}
 
 export type ActionSource = 'default' | 'undo' | 'redo' | 'skip';

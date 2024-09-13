@@ -11,13 +11,15 @@ export const AgentEditorSidebarContainerStyle = style({
 });
 
 export const AgentEditorSidebarStyle = style({
-	margin: 40,
-	padding: 10,
-	borderRadius: 20,
+	margin: 20,
+	marginBottom: 0,
+	padding: '10px 15px',
+	paddingBottom: 17,
+	borderRadius: '20px 20px 0 0',
 	willChange: "transform",
 	display: "flex",
 	flexDirection: "column",
-	alignItems: "center",
+	alignItems: "flex-start",
 	rowGap: 10,
 	backdropFilter: Colors.panels.blur,
 	backgroundColor: "rgba(207,219,222, 0.85)",
@@ -25,7 +27,7 @@ export const AgentEditorSidebarStyle = style({
 });
 
 export const AgentEditorSidebarTitleStyle = style({
-	backgroundColor: "rgba(10,20,30,0.1)",
+	backgroundColor: Colors.main.r,
 	padding: "5px 10px",
 	textTransform: "uppercase",
 	borderRadius: "10px",
@@ -33,13 +35,15 @@ export const AgentEditorSidebarTitleStyle = style({
 	letterSpacing: "0.2px",
 	lineHeight: "1em",
 	margin: 0,
+	marginTop: 5,
+	color: '#fff'
 });
 
 export const AgentEditorSidebarCardStyle = style({
 	backgroundColor: "white",
-	padding: "10px",
+	padding: "20px",
 	textTransform: "uppercase",
-	borderRadius: "10px",
-	boxShadow: "0px 3px 7px rgba(0,0,0,0.2)",
+	borderRadius: "16px",
+	boxShadow: "0px 2px 3px rgba(10,20,30,0.1), 0px 1px 2px 1px rgba(10,20,30,0.1)",
 	alignSelf: "stretch",
 });

@@ -31,6 +31,7 @@ export const Colors = {
 		edge: "#ccc",
 	},
 	text: {
+		t3: "#ABABAB",
 		t2: "#626262",
 		t1: "#343434",
 		r: "#141414",

@@ -11,8 +11,7 @@ export const TextStyle = recipe({
 	variants: {
 		level: {
 			title: {
-				fontSize: 46,
-				letterSpacing: '-0.6px',
+				fontSize: 44,
 				fontFamily: Playfair,
 			},
 			microtitle: {
@@ -38,6 +37,11 @@ export const TextStyle = recipe({
 				textOverflow: 'ellipsis',
 			},
 		},
+		pre: {
+			true: {
+				whiteSpace: 'pre-wrap'
+			}
+		},
 		ctx: {
 			default: {},
 			node: {},
@@ -53,8 +57,7 @@ export const TextStyle = recipe({
 				color: Colors.text.r,
 				fontFamily: Inter,
 				fontWeight: 'bold',
-				fontSize: 15,
-				marginBottom: 5,
+				fontSize: 15
 			},
 		},
 		{

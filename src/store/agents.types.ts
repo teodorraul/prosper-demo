@@ -192,7 +192,7 @@ export class AgentEditorNodeUserData {
 
 export type RemoteAgent = {
 	id?: number;
-	updated_at: string | undefined;
+	updated_at: any | undefined;
 	created_at: string;
 	data: {
 		edges: RemoteAgentEditorEdge[];

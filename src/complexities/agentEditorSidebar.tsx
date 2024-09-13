@@ -1,11 +1,17 @@
 import { observer } from 'mobx-react';
 import { useStore } from 'src/store/useStore';
 
-import { useAgentEditorNodeFormattedDetails, useNodeDetails } from './agentEditorNode.hooks';
 import {
-    AgentEditorSidebarCardStyle, AgentEditorSidebarContainerStyle, AgentEditorSidebarStyle,
-    AgentEditorSidebarTitleStyle
+	useAgentEditorNodeFormattedDetails,
+	useNodeDetails,
+} from './agentEditorNode.hooks';
+import {
+	AgentEditorSidebarContainerStyle,
+	AgentEditorSidebarStyle,
+	AgentEditorSidebarTitleStyle,
 } from './agentEditorSidebar.css';
+import { AESCNode } from './agentEditorSidebarContentNode';
+import { AESCRootNode } from './agentEditorSidebarContentsRootNode';
 
 export const AgentEditorSidebar = observer(() => {
 	const store = useStore();
@@ -21,9 +27,10 @@ export const AgentEditorSidebar = observer(() => {
 					<h5 className={AgentEditorSidebarTitleStyle}>
 						{formattedTitle}
 					</h5>
-					<div className={AgentEditorSidebarCardStyle}>
-						<span>test</span>
-					</div>
+					{selectedNodeDetails?.nodeType == 'start_call' && (
+						<AESCRootNode />
+					)}
+					{selectedNodeDetails?.nodeType == 'default' && <AESCNode />}
 				</div>
 			)}
 		</aside>

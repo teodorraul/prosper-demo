@@ -1,28 +1,35 @@
-import { Button } from 'src/components/button';
+import { observer } from 'mobx-react';
+import { Icon } from 'src/components/icon';
 import { Text } from 'src/components/text';
+import { useStore } from 'src/store/useStore';
 
-import { useAgentEditorNodeFormattedDetails, useNodeDetails } from './agentEditorNode.hooks';
-import { AENGlobalNodesTitle } from './agentEditorNodeRootContents.css';
+import {
+	AENRootContainerStyle,
+	AENRootHeaderStyle,
+	AENRootIconStyle,
+} from './agentEditorNodeRootContents.css';
 
 export const AgentEditorNodeRootContents: React.FC<{
 	nodeId: string;
-}> = ({ nodeId }) => {
-	const nodeDetails = useNodeDetails(nodeId);
-	const { formattedTitle, formattedDescription } =
-		useAgentEditorNodeFormattedDetails(nodeDetails);
-	// const globalNodesIds = useGlobalNodes(agentId);
+}> = observer(({ nodeId }) => {
+	const store = useStore();
+	const prompt = store.agentEditor.prompt;
+
 	return (
-		<div>
-			<Text level="title" ctx="node">
-				{formattedTitle}
-			</Text>
-			<Text level="body" ctx="node">
-				{formattedDescription}
-			</Text>
-			<div>
-				<h6 className={AENGlobalNodesTitle}>Global Behaviours</h6>
-				<Button title="Add new Behaviour" center type="subtlePrimary" />
+		<div className={AENRootContainerStyle}>
+			<div className={AENRootHeaderStyle}>
+				<Icon type="phone" className={AENRootIconStyle} />
+				<Text level="title" ctx="node">
+					Call Start
+				</Text>
 			</div>
+			{prompt ? (
+				<Text level="body" ctx="node" pre>
+					{prompt}
+				</Text>
+			) : (
+				<Text color="subtle">Start by setting a prompt.</Text>
+			)}
 		</div>
 	);
-};
+});

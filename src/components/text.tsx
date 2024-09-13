@@ -7,15 +7,19 @@ import { TextStyle } from './text.css';
 export const Text: React.FC<
 	{
 		children: ReactElement | string;
+		pre: boolean;
 	} & RecipeVariants<typeof TextStyle>
 > = ({
-	level = "body",
+	level = 'body',
 	children,
 	oneLine,
-	color = "text",
-	ctx = "default",
+	pre,
+	color = 'text',
+	ctx = 'default',
 }) => {
 	return (
-		<p className={TextStyle({ level, oneLine, ctx, color })}>{children}</p>
+		<p className={TextStyle({ level, oneLine, ctx, color, pre })}>
+			{children}
+		</p>
 	);
 };

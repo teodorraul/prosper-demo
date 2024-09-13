@@ -33,6 +33,7 @@ export class AgentEditorStore {
 	@observable accessor syncQueue: IObservableArray<SyncOperation> =
 		observable.array(undefined, { deep: false });
 	@observable accessor mountedAgentId: string | undefined = undefined;
+	@observable accessor prompt: string | undefined = undefined;
 
 	mountWithAgentId = (agentId: string) => {
 		if (
@@ -45,15 +46,13 @@ export class AgentEditorStore {
 		let agent = Store.agents.byId.get(agentId);
 		this.mountedAgentId = agentId;
 
-		console.log('Mounted', toJS(agent?.workflow));
 		if (agent) {
 			this.buildStateFrom(agent);
 
 			reaction(
 				() => toJS(Store.agents.byId),
-				(agents) => {
+				() => {
 					let agent = Store.agents.byId.get(agentId);
-					console.log('REceived new agent', agent);
 					if (agent) {
 						this.buildStateFrom(agent);
 					}
@@ -88,24 +87,41 @@ export class AgentEditorStore {
 		let promises = [];
 		for (const op of queue) {
 			promises.push(
-				new Promise<string>(async (res, rej) => {
+				new Promise<{ error: string | undefined, id: string }>(async (res, rej) => {
 					const { error } = await Store.agents.applyAgentOp(
 						agentId,
-						op
+						op,
+						(op) => {
+							let newOp = Store.agentEditor.syncQueue.find(o => o.id == op.id)
+							return newOp !== op
+						}
 					);
 					if (!error) {
-						res(op.id);
+						res({ error: undefined, id: op.id });
+						return;
+					} else {
+						res({ error: error, id: op.id });
 						return;
 					}
-					rej();
-					return;
 				})
 			);
 		}
 
-		let completedOps = await Promise.all(promises);
-		this.removeCompletedOps(completedOps);
-		this.setSyncing(false);
+		try {
+			let ops = await Promise.all(promises);
+			let completedOps = []
+			for (const op of ops) {
+				if (!op.error) {
+					completedOps.push(op.id)
+				}
+			}
+
+			this.removeCompletedOps(completedOps);
+			
+			this.setSyncing(false);	
+		} catch {
+			this.setSyncing(false);	
+		}
 	};
 
 	@action.bound
@@ -123,14 +139,18 @@ export class AgentEditorStore {
 		this.syncing = status;
 	}
 
-	getNodesAndEdgesFromOperations = () => {
+	getOverrideFromOperations = () => {
 		const opNodes: AENode[] = [];
 		const removedNodesIds: string[] = [];
 		const opEdges: AEEdge[] = [];
 		const nodeDetails: AgentWorkflowNode[] = [];
+		let pendingPrompt: string | undefined = undefined
 
 		for (const op of this.syncQueue) {
 			switch (op.operation) {
+				case 'update-prompt':
+					pendingPrompt = op.prompt
+					break
 				case 'upsert-node':
 					opNodes.push({
 						id: op.nodeDetails.id,
@@ -167,12 +187,12 @@ export class AgentEditorStore {
 					removedNodesIds.push(op.id);
 			}
 		}
-		return { opNodes, opEdges, nodeDetails, removedNodesIds };
+		return { opNodes, opEdges, nodeDetails, removedNodesIds, pendingPrompt };
 	};
 
 	buildStateFrom = async (agent: Agent) => {
-		const { opNodes, opEdges, nodeDetails, removedNodesIds } =
-			this.getNodesAndEdgesFromOperations();
+		const { opNodes, opEdges, nodeDetails, removedNodesIds, pendingPrompt } =
+			this.getOverrideFromOperations();
 
 		this.nodeDetails.replace({});
 
@@ -235,6 +255,8 @@ export class AgentEditorStore {
 		);
 
 		this.setNodesAndEdges(layoutedNodes, layoutedEdges);
+
+		this.prompt = pendingPrompt ?? agent.workflow.generalInstructions
 	};
 
 	relayoutNodes = async () => {
@@ -357,6 +379,7 @@ export class AgentEditorStore {
 		this.status = status;
 	}
 
+
 	@action.bound
 	selectNode(id: string | undefined, from: ActionSource = 'default') {
 		this.handleOpUndoRedo(from, {
@@ -456,6 +479,30 @@ export class AgentEditorStore {
 		}
 	};
 
+
+	@action.bound
+	setPrompt(value: string | undefined) {
+		this.prompt = value
+	}
+
+	@action.bound
+	notifyPromptUpdated(value: string | undefined, from: ActionSource = 'default') {
+		this.handleOpUndoRedo(from, {
+			type: 'prompt-updated',
+			value: this.prompt
+		});
+
+		this.prompt = value
+
+		for (const q of this.syncQueue) {
+			if (q.operation == 'update-prompt') {
+				this.syncQueue.remove(q);
+			}
+		}
+		this.syncQueue.push({ operation: 'update-prompt', prompt: this.prompt, id: uuid() });
+	}
+
+
 	executeAction = (action: EditorAction | undefined, from: ActionSource) => {
 		switch (action?.type) {
 			case 'select':
@@ -469,6 +516,9 @@ export class AgentEditorStore {
 					from
 				);
 				return;
+			case 'prompt-updated':
+				this.notifyPromptUpdated(action.value, from)
+				return
 			case 'remove-node':
 				this.removeNode(action.nodeId, from);
 		}
@@ -485,11 +535,11 @@ export class AgentEditorStore {
 	};
 
 	debugStacks = () => {
-		let undo = this.undoStack.map((n) => n.type + n.nodeId).join('\n');
-		let redo = this.redoStack.map((n) => n.type + n.nodeId).join('\n');
-		console.log('UNDO:\n', undo);
-		console.log('REDO:\n', redo);
-		console.log('---');
+		let undo = this.undoStack.map((n) => n.type + n.value).join('\n');
+		let redo = this.redoStack.map((n) => n.type + n.value).join('\n');
+		console.debug('UNDO:\n', undo);
+		console.debug('REDO:\n', redo);
+		console.debug('---');
 	};
 
 	@action.bound
