@@ -12,6 +12,7 @@ export const TextStyle = recipe({
 		level: {
 			title: {
 				fontSize: 46,
+				letterSpacing: '-0.6px',
 				fontFamily: Playfair,
 			},
 			microtitle: {
@@ -21,7 +22,7 @@ export const TextStyle = recipe({
 				textTransform: 'uppercase',
 			},
 			body: {
-				fontSize: 14,
+				fontSize: 13,
 				margin: 0,
 				lineHeight: '1.5em',
 			},

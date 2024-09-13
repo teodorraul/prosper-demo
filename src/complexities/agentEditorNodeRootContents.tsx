@@ -21,17 +21,6 @@ export const AgentEditorNodeRootContents: React.FC<{
 			</Text>
 			<div>
 				<h6 className={AENGlobalNodesTitle}>Global Behaviours</h6>
-				{/* <ul className={AENGlobalNodesContainerStyle}>
-					{globalNodesIds?.map((id) => {
-						return (
-							<AgentEditorGlobalNodeRow
-								key={id}
-								agentId={agentId}
-								nodeId={`${id}`}
-							/>
-						);
-					})}
-				</ul> */}
 				<Button title="Add new Behaviour" center type="subtlePrimary" />
 			</div>
 		</div>

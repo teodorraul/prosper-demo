@@ -59,11 +59,11 @@ export const useGlobalNodes = (agentId: string | undefined) => {
 
 	let agent = agentId ? store.agents.byId.get(agentId) : undefined;
 
-	const nodeIds = useMemo(() => {
-		return agent?.workflow.nodes
-			.filter((n) => n.nodeType == 'global')
-			?.map((n) => n.id);
-	}, [agent]);
+	const nodeDetails = computed(() =>
+		store.agentEditor.nodes.filter(
+			(n) => store.agentEditor.nodeDetails.get(n.id)?.nodeType == 'global'
+		)
+	).get();
 
-	return nodeIds;
+	return nodeDetails;
 };

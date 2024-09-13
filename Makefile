@@ -1,2 +1,2 @@
 dev:
-	op run --env-file="./.env" --no-masking -- yarn dev;
+	op run --env-file="./.dev.env" --no-masking -- yarn dev;

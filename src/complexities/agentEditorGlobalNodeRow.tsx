@@ -4,10 +4,9 @@ import {
 import { useAgentEditorNodeFormattedDetails, useNodeDetails } from './agentEditorNode.hooks';
 
 export const AgentEditorGlobalNodeRow: React.FC<{
-	agentId: string;
 	nodeId: string;
-}> = ({ agentId, nodeId }) => {
-	const details = useNodeDetails(agentId, nodeId);
+}> = ({ nodeId }) => {
+	const details = useNodeDetails(nodeId);
 
 	const { formattedDescription, formattedTitle } =
 		useAgentEditorNodeFormattedDetails(details);

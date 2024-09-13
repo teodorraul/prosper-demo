@@ -15,14 +15,12 @@ export const useAgentEditorSpanner = () => {
 
 	useEffect(() => {
 		const vp = flow.getViewport();
-		console.log('scrollin', node?.id, node, node?.measured);
 		if (node && node.measured) {
 			let bounds = getNodesBounds([node]);
 			let centerX = bounds.x + bounds.width / 2;
 			let centerY = bounds.y + bounds.height / 2;
 			vp.x = bounds.x;
 			vp.y = bounds.y;
-			console.log(node.measured);
 			flow.setCenter(centerX + 40, centerY, {
 				zoom: 1,
 				duration: MOVE_TIME,

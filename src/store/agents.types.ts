@@ -15,8 +15,6 @@ export class Agent {
 				? new Date(remote.updated_at)
 				: undefined;
 			this.workflow = new AgentWorkflow(remote);
-
-			console.log(this);
 		} else {
 			this.id = '';
 			this.createdAt = new Date();
@@ -112,6 +110,7 @@ export class AgentWorkflowNode {
 	readonly nodeType: RemoteNodeType;
 	readonly prompt: string;
 	readonly isGlobal: boolean;
+	readonly order: number;
 	readonly userData: AgentEditorNodeUserData[];
 
 	constructor(remote?: RemoteAgentEditorNode) {
@@ -122,6 +121,7 @@ export class AgentWorkflowNode {
 			this.nodeType = remote.node_type;
 			this.prompt = remote.prompt;
 			this.isGlobal = remote.is_global;
+			this.order = remote.order ?? 1;
 			this.userData = [];
 
 			if (remote.is_global) {
@@ -142,6 +142,7 @@ export class AgentWorkflowNode {
 			this.nodeType = 'start_call';
 			this.nodeName = 'call_start';
 			this.prompt = '';
+			this.order = 1;
 			this.isGlobal = false;
 			this.userData = [];
 			this.nodeEnterCondition = '';
@@ -203,8 +204,8 @@ export type RemoteAgent = {
 export type RemoteAgentEditorEdge = {
 	id: string;
 	label: string | null;
-	source: number;
-	target: number;
+	source: string;
+	target: string;
 };
 
 export type RemoteAgentEditorNode = {
@@ -213,6 +214,7 @@ export type RemoteAgentEditorNode = {
 	node_name: string;
 	node_type: RemoteNodeType;
 	prompt: string;
+	order?: number;
 	is_global: boolean;
 	user_data: RemoteAgentEditorNodeUserData[];
 };

@@ -18,6 +18,7 @@ import { useAgentEditorSpanner } from './agentEditor.spanner';
 import { AgentEditorEdge } from './agentEditorEdge';
 import { AgentEditorNode } from './agentEditorNode';
 import { AgentEditorSidebar } from './agentEditorSidebar';
+import { AgentEditorSyncingBar } from './agentEditorSyncingBar';
 
 export const AgentEditor = observer(() => {
 	let { id: agentId } = useParams();
@@ -191,6 +192,7 @@ export const AgentEditor = observer(() => {
 				/>
 			</ReactFlow>
 			<AgentEditorSidebar />
+			<AgentEditorSyncingBar />
 		</main>
 	);
 });

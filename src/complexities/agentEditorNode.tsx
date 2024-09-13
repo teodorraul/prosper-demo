@@ -36,7 +36,6 @@ export const AgentEditorNode: React.FC<NodeProps> = observer(
 				case undefined:
 					return <></>;
 				default:
-					console.log('nono', details?.nodeType);
 					throw new Error(
 						'unsupported node type: ' + details?.nodeType
 					);

@@ -1,49 +1,17 @@
 import deepEqual from 'deep-equal';
 import { action, IObservableArray, observable, reaction, toJS } from 'mobx';
 import { v4 as uuid } from 'uuid';
+import { node } from 'webpack';
 
 import Dagre from '@dagrejs/dagre';
 import { EdgeChange, NodeChange, NodeDimensionChange, Viewport } from '@xyflow/react';
 
-import { AEEdge, AENode } from './agentEditor.types';
+import {
+    ActionSource, AEEdge, AENode, EditorAction, HoveredNode, MountStatus, SyncOperation
+} from './agentEditor.types';
+import { getChildrenNodeIds, getNextPositions, getNodesParentId } from './agentEditor.utils';
 import { Agent, AgentWorkflowNode, RemoteAgentEditorNode } from './agents.types';
 import Store from './root.store';
-
-type MountStatus =
-	| {
-			status: 'mounted';
-			forAgentId: string;
-	  }
-	| { status: 'mounting' }
-	| { status: 'failedToMount' };
-
-type EditorAction =
-	| {
-			type: 'select';
-			nodeId: string | undefined;
-	  }
-	| {
-			type: 'insert-node';
-			nodeId: string | undefined;
-			side: 'right' | 'left';
-	  }
-	| {
-			type: 'remove-node';
-			nodeId: string | undefined;
-			side: 'right' | 'left';
-	  };
-
-type HoveredNode = {
-	id: string;
-	side: 'left' | 'right';
-};
-
-type SyncOperation = {
-	operation: 'upsert-node';
-	node: AgentWorkflowNode;
-	id: string;
-	parentId: string;
-};
 
 export class AgentEditorStore {
 	@observable accessor status: MountStatus | undefined = undefined;
@@ -64,6 +32,7 @@ export class AgentEditorStore {
 	@observable accessor hoveredNode: HoveredNode | undefined = undefined;
 	@observable accessor syncQueue: IObservableArray<SyncOperation> =
 		observable.array(undefined, { deep: false });
+	@observable accessor mountedAgentId: string | undefined = undefined;
 
 	mountWithAgentId = (agentId: string) => {
 		if (
@@ -74,14 +43,17 @@ export class AgentEditorStore {
 		}
 
 		let agent = Store.agents.byId.get(agentId);
+		this.mountedAgentId = agentId;
 
+		console.log('Mounted', toJS(agent?.workflow));
 		if (agent) {
 			this.buildStateFrom(agent);
 
 			reaction(
 				() => toJS(Store.agents.byId),
 				(agents) => {
-					let agent = agents.get(agentId);
+					let agent = Store.agents.byId.get(agentId);
+					console.log('REceived new agent', agent);
 					if (agent) {
 						this.buildStateFrom(agent);
 					}
@@ -90,7 +62,9 @@ export class AgentEditorStore {
 
 			reaction(
 				() => this.syncQueue.slice(),
-				(queue) => {
+				async (queue) => {
+					this.syncWithSupa(queue);
+
 					let agent = Store.agents.byId.get(agentId);
 					if (agent) {
 						this.buildStateFrom(agent);
@@ -104,8 +78,54 @@ export class AgentEditorStore {
 		}
 	};
 
+	@observable accessor syncing = false;
+	syncWithSupa = async (queue: SyncOperation[]) => {
+		if (this.syncing) return;
+		let agentId = this.mountedAgentId;
+		if (!agentId) return;
+
+		this.setSyncing(true);
+		let promises = [];
+		for (const op of queue) {
+			promises.push(
+				new Promise<string>(async (res, rej) => {
+					const { error } = await Store.agents.applyAgentOp(
+						agentId,
+						op
+					);
+					if (!error) {
+						res(op.id);
+						return;
+					}
+					rej();
+					return;
+				})
+			);
+		}
+
+		let completedOps = await Promise.all(promises);
+		this.removeCompletedOps(completedOps);
+		this.setSyncing(false);
+	};
+
+	@action.bound
+	removeCompletedOps(completedOps: string[]) {
+		for (const opId of completedOps) {
+			let op = this.syncQueue.find((o) => o.id == opId);
+			if (op) {
+				this.syncQueue.remove(op);
+			}
+		}
+	}
+
+	@action.bound
+	setSyncing(status: boolean) {
+		this.syncing = status;
+	}
+
 	getNodesAndEdgesFromOperations = () => {
 		const opNodes: AENode[] = [];
+		const removedNodesIds: string[] = [];
 		const opEdges: AEEdge[] = [];
 		const nodeDetails: AgentWorkflowNode[] = [];
 
@@ -113,13 +133,14 @@ export class AgentEditorStore {
 			switch (op.operation) {
 				case 'upsert-node':
 					opNodes.push({
-						id: op.node.id,
+						id: op.nodeDetails.id,
 						type: 'node',
 						position: { x: 0, y: 0 },
 						data: {},
 					});
+
 					let nodeBootstrap: RemoteAgentEditorNode = {
-						id: op.node.id,
+						id: op.nodeDetails.id,
 						node_enter_condition: '',
 						node_name: '',
 						node_type: 'default',
@@ -128,38 +149,32 @@ export class AgentEditorStore {
 						user_data: [],
 					};
 					nodeDetails.push(new AgentWorkflowNode(nodeBootstrap));
-					opEdges.push({
-						id: op.node.id + '_edge',
-						type: 'edge',
-						source: op.parentId,
-						target: op.node.id,
-					});
+
+					if (op.parentId) {
+						let edgeId = op.nodeDetails.id + '_edge';
+						if (!opEdges.find((o) => o.id == edgeId)) {
+							opEdges.push({
+								id: edgeId,
+								type: 'edge',
+								source: op.parentId,
+								target: op.nodeDetails.id,
+							});
+						}
+					}
 
 					break;
+				case 'delete-node':
+					removedNodesIds.push(op.id);
 			}
 		}
-		return { opNodes, opEdges, nodeDetails };
+		return { opNodes, opEdges, nodeDetails, removedNodesIds };
 	};
 
 	buildStateFrom = async (agent: Agent) => {
-		const { opNodes, opEdges, nodeDetails } =
+		const { opNodes, opEdges, nodeDetails, removedNodesIds } =
 			this.getNodesAndEdgesFromOperations();
 
 		this.nodeDetails.replace({});
-
-		let unlayoutedEdges = [
-			...agent.workflow.edges.map((e) => {
-				let node: AEEdge = {
-					id: `${e.id}`,
-					type: 'edge',
-					data: {},
-					source: `${e.source}`,
-					target: `${e.target}`,
-				};
-				return node;
-			}),
-			...opEdges,
-		];
 
 		let unlayoutedNodes: AENode[] = [
 			// We exclude the global nodes, since we handle them as rows...
@@ -177,8 +192,35 @@ export class AgentEditorStore {
 					};
 					return node;
 				}),
-			...opNodes,
 		];
+
+		let unlayoutedEdges = [
+			...agent.workflow.edges.map((e) => {
+				let node: AEEdge = {
+					id: `${e.id}`,
+					type: 'edge',
+					data: {},
+					source: `${e.source}`,
+					target: `${e.target}`,
+				};
+				return node;
+			}),
+		];
+
+		for (const n of opNodes) {
+			unlayoutedNodes = unlayoutedNodes.filter((ue) => ue.id != n.id);
+			unlayoutedNodes.push(n);
+		}
+
+		for (const e of opEdges) {
+			unlayoutedEdges = unlayoutedEdges.filter((ue) => ue.id != e.id);
+			unlayoutedEdges.push(e);
+		}
+
+		for (const id of removedNodesIds) {
+			unlayoutedEdges = unlayoutedEdges.filter((e) => e.target != id);
+			unlayoutedNodes = unlayoutedNodes.filter((e) => e.id != id);
+		}
 
 		for (let node of agent.workflow.nodes) {
 			this.nodeDetails.set(node.id, node);
@@ -187,7 +229,6 @@ export class AgentEditorStore {
 			this.nodeDetails.set(node.id, node);
 		}
 
-		console.log(unlayoutedNodes, unlayoutedEdges);
 		const { layoutedEdges, layoutedNodes } = this.layoutTree(
 			unlayoutedNodes,
 			unlayoutedEdges
@@ -241,7 +282,9 @@ export class AgentEditorStore {
 
 		g.nodes().forEach(function (v) {
 			let node = g.node(v) as any;
-			node.y = minYByRank[node.rank];
+			if (node) {
+				node.y = minYByRank[node.rank];
+			}
 		});
 
 		return {
@@ -265,7 +308,6 @@ export class AgentEditorStore {
 					break;
 				case 'dimensions':
 					if (change.dimensions) {
-						console.log(change);
 						dimensionChanges.push(change);
 					}
 					break;
@@ -276,11 +318,6 @@ export class AgentEditorStore {
 				case 'position':
 					break;
 				case 'select':
-					// if (change.selected) {
-					// 	this.selectNode(change.id);
-					// } else {
-					// 	this.selectNode(undefined);
-					// }
 					break;
 			}
 		}
@@ -302,9 +339,7 @@ export class AgentEditorStore {
 		this.relayoutNodes();
 	}
 
-	onEdgesChange = (changes: EdgeChange[]) => {
-		// console.log("edges changed", changes);
-	};
+	onEdgesChange = (changes: EdgeChange[]) => {};
 
 	@action.bound
 	setNodesAndEdges(nodes: AENode[], edges: AEEdge[]) {
@@ -324,75 +359,118 @@ export class AgentEditorStore {
 
 	@action.bound
 	selectNode(id: string | undefined, from: ActionSource = 'default') {
-		if (from == 'default' || from == 'redo') {
-			this.undoStack.push({
-				type: 'select',
-				nodeId: this.selectedNode,
-			});
-			if (from == 'default') {
-				this.redoStack = [];
-			}
-		}
-
-		if (from == 'undo') {
-			this.redoStack.push({
-				type: 'select',
-				nodeId: this.selectedNode,
-			});
-		}
+		this.handleOpUndoRedo(from, {
+			type: 'select',
+			nodeId: this.selectedNode,
+		});
 
 		this.selectedNode = id;
 	}
 
 	@action.bound
 	insertNode(
-		parentNodeId: string,
-		side: 'left' | 'right',
+		parentNodeId?: string,
+		side?: 'left' | 'right',
+		withDetails?: RemoteAgentEditorNode,
 		from: ActionSource = 'default'
 	) {
-		let nodeId = uuid();
+		let nodeId = withDetails?.id ?? uuid();
+		var nextPosition = withDetails?.order ?? 0;
+
+		if (!withDetails) {
+			let childrenIds = getChildrenNodeIds(nodeId, this.edges);
+			let positions = getNextPositions(this.nodeDetails, childrenIds);
+			nextPosition = side == 'left' ? positions.min : positions.max;
+		}
+
+		this.handleOpUndoRedo(from, {
+			type: 'remove-node',
+			nodeId: nodeId,
+		});
+
+		let payload: RemoteAgentEditorNode = withDetails ?? {
+			id: nodeId,
+			node_enter_condition: '',
+			node_type: 'default',
+			node_name: '',
+			prompt: '',
+			order: nextPosition,
+			is_global: false,
+			user_data: [],
+		};
+
 		this.syncQueue.push({
 			operation: 'upsert-node',
 			id: uuid(),
 			parentId: parentNodeId,
-			node: new AgentWorkflowNode({
-				id: nodeId,
-				node_enter_condition: '',
-				node_type: 'default',
-				node_name: '',
-				prompt: '',
-				is_global: false,
-				user_data: [],
-			}),
+			nodeDetails: new AgentWorkflowNode(payload),
 		});
-		this.selectNode(nodeId);
 
-		// if (from == 'default' || from == 'redo') {
-		// 	this.undoStack.push({
-		// 		type: 'select',
-		// 		nodeId: this.selectedNode,
-		// 	});
-		// 	if (from == 'default') {
-		// 		this.redoStack = [];
-		// 	}
-		// }
+		for (const q of this.syncQueue) {
+			if (q.operation == 'delete-node' && q.id == nodeId) {
+				this.syncQueue.remove(q);
+			}
+		}
 
-		// if (from == 'undo') {
-		// 	this.redoStack.push({
-		// 		type: 'select',
-		// 		nodeId: this.selectedNode,
-		// 	});
-		// }
-
-		// this.selectedNode = id;
-
-		// console.log(parentNodeId, side, from);
+		this.selectNode(nodeId, 'skip');
 	}
+
+	@action.bound
+	removeNode(nodeId: string, from: ActionSource = 'default') {
+		let nodeDetails = this.nodeDetails.get(nodeId);
+		const parentId = getNodesParentId(nodeId, this.edges);
+
+		if (!nodeDetails) return;
+
+		this.handleOpUndoRedo(from, {
+			type: 'insert-node',
+			nodeId: nodeId,
+			parentId: parentId,
+			details: nodeDetails?.serializedForSupa,
+		});
+
+		for (const q of this.syncQueue) {
+			if (q.operation == 'upsert-node' && q.nodeDetails.id == nodeId) {
+				this.syncQueue.remove(q);
+			}
+		}
+		this.syncQueue.push({ operation: 'delete-node', id: nodeId });
+
+		let parent = getNodesParentId(nodeId, this.edges);
+		if (parent) {
+			this.selectNode(parent, 'skip');
+		}
+	}
+
+	handleOpUndoRedo = (from: ActionSource, reverseAction: EditorAction) => {
+		if (from != 'skip') {
+			if (from == 'default' || from == 'redo') {
+				this.undoStack.push(reverseAction);
+				if (from == 'default') {
+					this.redoStack = [];
+				}
+			}
+			if (from == 'undo') {
+				this.redoStack.push(reverseAction);
+			}
+		}
+	};
 
 	executeAction = (action: EditorAction | undefined, from: ActionSource) => {
 		switch (action?.type) {
 			case 'select':
 				this.selectNode(action.nodeId, from);
+				return;
+			case 'insert-node':
+				this.insertNode(
+					action.parentId,
+					undefined,
+					action.details,
+					from
+				);
+				return;
+			case 'remove-node':
+				this.removeNode(action.nodeId, from);
 		}
 	};
 
@@ -406,6 +484,14 @@ export class AgentEditorStore {
 		this.executeAction(lastAction, 'redo');
 	};
 
+	debugStacks = () => {
+		let undo = this.undoStack.map((n) => n.type + n.nodeId).join('\n');
+		let redo = this.redoStack.map((n) => n.type + n.nodeId).join('\n');
+		console.log('UNDO:\n', undo);
+		console.log('REDO:\n', redo);
+		console.log('---');
+	};
+
 	@action.bound
 	handleViewportChange(viewport: Viewport) {
 		if (!deepEqual(this.viewport, viewport)) {
@@ -413,5 +499,3 @@ export class AgentEditorStore {
 		}
 	}
 }
-
-type ActionSource = 'default' | 'undo' | 'redo';
