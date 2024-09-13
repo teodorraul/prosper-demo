@@ -1,8 +1,8 @@
 // https://heroicons.com/solid
-export const Icon: React.FC<{ type: 'phone'; className: string }> = ({
-	type,
-	className,
-}) => {
+export const Icon: React.FC<{
+	type: 'phone' | 'selector' | 'xmark' | 'shutdown';
+	className?: string;
+}> = ({ type, className }) => {
 	if (type == 'phone')
 		return (
 			<svg
@@ -18,5 +18,68 @@ export const Icon: React.FC<{ type: 'phone'; className: string }> = ({
 				/>
 			</svg>
 		);
+
+	if (type == 'xmark')
+		return (
+			<svg
+				width="12"
+				height="11"
+				viewBox="0 0 12 11"
+				fill="none"
+				xmlns="http://www.w3.org/2000/svg"
+				className={className}
+			>
+				<line
+					x1="1.37959"
+					y1="1.29289"
+					x2="10.3796"
+					y2="10.2929"
+					stroke="currentColor"
+					strokeWidth="2"
+				/>
+				<line
+					y1="-1"
+					x2="12.7279"
+					y2="-1"
+					transform="matrix(-0.707107 0.707107 0.707107 0.707107 11 2)"
+					stroke="currentColor"
+					strokeWidth="2"
+				/>
+			</svg>
+		);
+
+	if (type == 'selector')
+		return (
+			<svg
+				width="12"
+				height="24"
+				viewBox="0 0 12 24"
+				fill="none"
+				xmlns="http://www.w3.org/2000/svg"
+				className={className}
+			>
+				<path d="M6 4L2 9H10L6 4Z" fill="black" />
+				<path d="M6 20L10 15H2L6 20Z" fill="black" />
+			</svg>
+		);
+
+	if (type == 'shutdown')
+		return (
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				fill="none"
+				viewBox="0 0 24 24"
+				strokeWidth={1.5}
+				stroke="currentColor"
+				className={className}
+			>
+				<path
+					strokeLinecap="round"
+					strokeLinejoin="round"
+					d="M5.636 5.636a9 9 0 1 0 12.728 0M12 3v9"
+				/>
+			</svg>
+		);
+
 	return <></>;
 };

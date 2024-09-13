@@ -4,33 +4,13 @@ import { v4 as uuid } from 'uuid';
 import { node } from 'webpack';
 
 import Dagre from '@dagrejs/dagre';
-import {
-	EdgeChange,
-	NodeChange,
-	NodeDimensionChange,
-	Viewport,
-} from '@xyflow/react';
+import { EdgeChange, NodeChange, NodeDimensionChange, Viewport } from '@xyflow/react';
 
 import {
-	ActionSource,
-	AEEdge,
-	AENode,
-	EditorAction,
-	HoveredNode,
-	MountStatus,
-	SyncOperation,
+    ActionSource, AEEdge, AENode, EditorAction, HoveredNode, MountStatus, SyncOperation
 } from './agentEditor.types';
-import {
-	getChildrenNodeIds,
-	getNextPositions,
-	getNodesParentId,
-} from './agentEditor.utils';
-import {
-	Agent,
-	AgentWorkflowNode,
-	RAENodePayload,
-	RemoteAgentEditorNode,
-} from './agents.types';
+import { getNodesParentId } from './agentEditor.utils';
+import { Agent, AgentWorkflowNode, RAENodePayload, RemoteAgentEditorNode } from './agents.types';
 import Store from './root.store';
 
 export class AgentEditorStore {
@@ -191,6 +171,7 @@ export class AgentEditorStore {
 						node_type: op.nodeDetails.nodeType ?? '',
 						prompt: op.nodeDetails.prompt ?? '',
 						is_global: op.nodeDetails.isGlobal ?? false,
+						order: op.nodeDetails.order ?? 1,
 						user_data:
 							op.nodeDetails.serializedUserDataForSupa ?? [],
 					};
@@ -292,10 +273,28 @@ export class AgentEditorStore {
 			}
 		}
 
+		for (const node of unlayoutedNodes) {
+			var needsEnding = true;
+			for (const edge of unlayoutedEdges) {
+				if (edge.source == node.id) {
+					needsEnding = false;
+				}
+			}
+			node.data.needsEnding = needsEnding;
+		}
+
 		const { layoutedEdges, layoutedNodes } = this.layoutTree(
 			unlayoutedNodes,
 			unlayoutedEdges
 		);
+
+		this.nodeCountForNodeId = {};
+		for (const edge of layoutedEdges) {
+			if (!this.nodeCountForNodeId[edge.source]) {
+				this.nodeCountForNodeId[edge.source] = 0;
+			}
+			this.nodeCountForNodeId[edge.source]++;
+		}
 
 		this.setNodesAndEdges(layoutedNodes, layoutedEdges);
 
@@ -311,6 +310,8 @@ export class AgentEditorStore {
 		this.setNodesAndEdges(layoutedNodes, layoutedEdges);
 	};
 
+	nodeCountForNodeId: { [key: string]: number } = {};
+
 	layoutTree = (
 		nodes: AENode[],
 		edges: AEEdge[]
@@ -324,6 +325,12 @@ export class AgentEditorStore {
 		});
 
 		edges.forEach((edge) => g.setEdge(edge.source, edge.target));
+
+		nodes.sort(
+			(a, b) =>
+				this.nodeDetails.get(a)?.order > this.nodeDetails.get(b)?.order
+		);
+
 		nodes.forEach((node) =>
 			g.setNode(node.id, {
 				...node,
@@ -339,6 +346,11 @@ export class AgentEditorStore {
 		nodes.map((node) => {
 			const position = g.node(node.id);
 			let rank = position.rank as any;
+
+			let nd = this.nodeDetails.get(node.id);
+			if (nd) {
+				nd.rank = rank;
+			}
 			let y = position.y - (node.measured?.height ?? 0) / 2;
 			if (minYByRank[rank] === undefined || y > minYByRank[rank]) {
 				minYByRank[rank] = y;
@@ -392,6 +404,26 @@ export class AgentEditorStore {
 		}
 	};
 
+	duplicateSelectedNode = () => {
+		if (this.selectedNode) {
+			let parentId = getNodesParentId(this.selectedNode, this.edges);
+			let selectedId = this.selectedNode;
+			if (parentId) {
+				let details = this.nodeDetails.get(selectedId);
+				if (details?.nodeType != 'default') {
+					return;
+				}
+				if (details) {
+					this.insertNode(parentId, 'right', {
+						...details?.serializedForSupa,
+						order: this.getNextPosition(parentId, 'right'),
+						id: uuid(),
+					});
+				}
+			}
+		}
+	};
+
 	@action.bound
 	updateNodesDimensions(changes: NodeDimensionChange[]) {
 		for (const change of changes) {
@@ -432,20 +464,31 @@ export class AgentEditorStore {
 		this.selectedNode = id;
 	}
 
+	getNextPosition = (
+		parentNodeId: string,
+		side?: 'left' | 'right' | 'center'
+	) => {
+		if (parentNodeId) {
+			let dir = side == 'left' ? -1 : 1;
+			return (
+				((this.nodeCountForNodeId[parentNodeId] ?? 0) + 1) * 100 * dir
+			);
+		}
+		return 0;
+	};
+
 	@action.bound
 	insertNode(
 		parentNodeId?: string,
-		side?: 'left' | 'right',
+		side?: 'left' | 'right' | 'center',
 		withDetails?: RemoteAgentEditorNode,
 		from: ActionSource = 'default'
 	) {
 		let nodeId = withDetails?.id ?? uuid();
 		var nextPosition = withDetails?.order ?? 0;
 
-		if (!withDetails) {
-			let childrenIds = getChildrenNodeIds(nodeId, this.edges);
-			let positions = getNextPositions(this.nodeDetails, childrenIds);
-			nextPosition = side == 'left' ? positions.min : positions.max;
+		if (parentNodeId) {
+			nextPosition = this.getNextPosition(parentNodeId, side);
 		}
 
 		this.handleOpUndoRedo(from, {
@@ -456,7 +499,7 @@ export class AgentEditorStore {
 		let payload: RemoteAgentEditorNode = withDetails ?? {
 			id: nodeId,
 			node_enter_condition: '',
-			node_type: 'default',
+			node_type: side == 'center' ? 'end_call' : 'default',
 			node_name: '',
 			prompt: '',
 			order: nextPosition,
@@ -470,6 +513,7 @@ export class AgentEditorStore {
 			parentId: parentNodeId,
 			nodeDetails: new AgentWorkflowNode(payload),
 		});
+		console.log(payload);
 
 		for (const q of this.syncQueue) {
 			if (q.operation == 'delete-node' && q.id == nodeId) {
@@ -537,10 +581,10 @@ export class AgentEditorStore {
 		}
 		this.syncQueue.push({ operation: 'delete-node', id: nodeId });
 
-		let parent = getNodesParentId(nodeId, this.edges);
-		if (parent) {
-			this.selectNode(parent, 'skip');
-		}
+		// let parent = getNodesParentId(nodeId, this.edges);
+		// if (parent) {
+		// 	this.selectNode(parent, 'skip');
+		// }
 	}
 
 	handleOpUndoRedo = (from: ActionSource, reverseAction: EditorAction) => {

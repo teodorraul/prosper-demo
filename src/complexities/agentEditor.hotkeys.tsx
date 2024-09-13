@@ -66,6 +66,12 @@ export const useAgentEditorHotkeys = () => {
 				return;
 			}
 
+			if ((event.ctrlKey || event.metaKey) && event.key === 'd') {
+				event.preventDefault();
+				store.agentEditor.duplicateSelectedNode();
+				return;
+			}
+
 			if (event.key === 'Delete' || event.key === 'Backspace') {
 				event.preventDefault();
 				if (sel) {

@@ -25,7 +25,6 @@ export const useAgentEditorSpanner = () => {
 			let sidebar = document.querySelector('.editor-sidebar');
 			let width = sidebar?.getBoundingClientRect().width ?? 0;
 
-			console.log('ww', width);
 			flow.setCenter(centerX + width / 2, centerY, {
 				zoom: 1,
 				duration: MOVE_TIME,

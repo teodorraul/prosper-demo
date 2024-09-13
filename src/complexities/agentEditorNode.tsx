@@ -1,8 +1,9 @@
 import { observer } from 'mobx-react';
 import { useMemo } from 'react';
+import { AENode } from 'src/store/agentEditor.types';
 import { useStore } from 'src/store/useStore';
 
-import { Handle, NodeProps, Position } from '@xyflow/react';
+import { Handle, Position } from '@xyflow/react';
 
 import { AENContainerStyle, AENInnerStyle, AENOutlineStyle } from './agentEditorNode.css';
 import { useNodeDetails } from './agentEditorNode.hooks';
@@ -11,7 +12,7 @@ import { AgentEditorNodeContents } from './agentEditorNodeContents';
 import { AgentEditorNodeFinalContents } from './agentEditorNodeFinalContents';
 import { AgentEditorNodeRootContents } from './agentEditorNodeRootContents';
 
-export const AgentEditorNode: React.FC<NodeProps> = observer(
+export const AgentEditorNode: React.FC<AENode> = observer(
 	({ id: nodeId, data, selected: rfSelected, ...props }) => {
 		const details = useNodeDetails(nodeId);
 		const store = useStore();
@@ -60,7 +61,14 @@ export const AgentEditorNode: React.FC<NodeProps> = observer(
 						position={Position.Top}
 						style={{ visibility: 'hidden' }}
 					/>
-					<AgentEditorNodeButtons nodeId={nodeId} />
+					{details?.nodeType == 'end_call' ? (
+						<></>
+					) : (
+						<AgentEditorNodeButtons
+							nodeId={nodeId}
+							needsEnding={data.needsEnding}
+						/>
+					)}
 				</div>
 			</div>
 		);

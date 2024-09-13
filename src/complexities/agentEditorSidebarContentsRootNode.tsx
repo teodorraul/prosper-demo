@@ -30,7 +30,7 @@ export const AESCRootNode = observer(() => {
 					remoteValue={store.agentEditor.prompt}
 					placeholder="Describe the agent's characteristics, i.e. where she's working it, etc."
 					// onChange={handlePromptChange}
-					autofocusIfEmpty
+					// autofocusIfEmpty
 					onDelayedChange={handleDelayedChange}
 				/>
 			</div>

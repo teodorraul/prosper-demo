@@ -8,5 +8,5 @@ export const AESCNodeNodeNameStyle = style({
 
 export const AESCNodeConditionStyle = style({
 	minHeight: 80,
-	marginTop: 5,
+	marginTop: 10,
 });

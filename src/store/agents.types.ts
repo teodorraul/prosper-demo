@@ -112,6 +112,7 @@ export class AgentWorkflowNode {
 	readonly isGlobal: boolean;
 	readonly order: number;
 	readonly userData: AgentEditorNodeUserData[];
+	rank: number | undefined;
 
 	constructor(remote?: RemoteAgentEditorNode) {
 		if (remote) {
@@ -162,6 +163,7 @@ export class AgentWorkflowNode {
 			node_enter_condition: this.nodeEnterCondition,
 			node_type: this.nodeType,
 			prompt: this.prompt,
+			order: this.order,
 			is_global: this.isGlobal,
 			user_data: data,
 		};
@@ -179,11 +181,13 @@ export class AgentWorkflowNode {
 }
 
 export class AgentEditorNodeUserData {
+	id: string;
 	name: string;
 	readonly dataType: string;
 	readonly description: string;
 
 	constructor(remoteData: RemoteAgentEditorNodeUserData) {
+		this.id = remoteData.id || uuid();
 		this.name = remoteData.name;
 		this.description = remoteData.description;
 		this.dataType = remoteData.data_type;
@@ -191,6 +195,7 @@ export class AgentEditorNodeUserData {
 
 	get serializedForSupa(): RemoteAgentEditorNodeUserData {
 		return {
+			id: this.id,
 			name: this.name,
 			data_type: this.dataType,
 			description: this.description,
@@ -239,6 +244,7 @@ export type RemoteNodeType =
 	| 'end_call';
 
 export type RemoteAgentEditorNodeUserData = {
+	id: string | undefined;
 	name: string;
 	data_type: string;
 	description: string;

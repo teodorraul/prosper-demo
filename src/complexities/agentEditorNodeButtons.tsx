@@ -4,53 +4,71 @@ import { Button } from 'src/components/button';
 import { useClickHandler } from 'src/hooks/useClickHandler';
 import { useStore } from 'src/store/useStore';
 
+import { useNodeDetails } from './agentEditorNode.hooks';
 import {
-    AENButton, AENButtonLeftSide, AENButtonRightSide, AENButtonsHolder
+    AENButton, AENButtonEnding, AENButtonLeftSide, AENButtonRightSide, AENButtonsHolder,
+    AENEndingButton
 } from './agentEditorNodeButtons.css';
 
-export const AgentEditorNodeButtons: React.FC<{ nodeId: string }> = observer(
-	({ nodeId }) => {
-		const store = useStore();
-		const hoveredSide = computed(() =>
-			store.agentEditor.hoveredNode?.id == nodeId
-				? store.agentEditor.hoveredNode.side
-				: undefined
-		).get();
+export const AgentEditorNodeButtons: React.FC<{
+	nodeId: string;
+	needsEnding: boolean;
+}> = observer(({ nodeId, needsEnding }) => {
+	const store = useStore();
+	const details = useNodeDetails(nodeId);
 
-		const handleAdd = useClickHandler(
-			'side',
-			(side: 'left' | 'right', ev) => {
-				ev.stopPropagation();
-				store.agentEditor.insertNode(nodeId, side);
-			},
-			[nodeId]
-		);
+	const hoveredSide = computed(() =>
+		store.agentEditor.hoveredNode?.id == nodeId
+			? store.agentEditor.hoveredNode.side
+			: undefined
+	).get();
 
-		return (
-			<div className={AENButtonsHolder}>
-				{hoveredSide === 'left' && (
-					<div className={AENButtonLeftSide}>
-						<Button
-							circle
-							data-side="left"
-							title="+"
-							className={AENButton}
-							action={handleAdd}
-						/>
-					</div>
-				)}
-				{hoveredSide === 'right' && (
-					<div className={AENButtonRightSide}>
-						<Button
-							data-side="right"
-							circle
-							title="+"
-							className={AENButton}
-							action={handleAdd}
-						/>
-					</div>
-				)}
-			</div>
-		);
-	}
-);
+	const handleAdd = useClickHandler(
+		'side',
+		(side: 'left' | 'center' | 'right', ev) => {
+			ev.stopPropagation();
+			store.agentEditor.insertNode(nodeId, side);
+		},
+		[nodeId]
+	);
+
+	const shouldShowFinalNodeButton =
+		details?.nodeType == 'start_call' || details?.nodeType == 'default';
+	return (
+		<div className={AENButtonsHolder}>
+			{hoveredSide === 'left' && (
+				<div className={AENButtonLeftSide}>
+					<Button
+						circle
+						data-side="left"
+						title="+"
+						className={AENButton}
+						action={handleAdd}
+					/>
+				</div>
+			)}
+			{hoveredSide === 'right' && (
+				<div className={AENButtonRightSide}>
+					<Button
+						data-side="right"
+						circle
+						title="+"
+						className={AENButton}
+						action={handleAdd}
+					/>
+				</div>
+			)}
+			{shouldShowFinalNodeButton && needsEnding && (
+				<div className={AENButtonEnding}>
+					<Button
+						data-side="center"
+						circle
+						title="Add End Call Node"
+						className={AENEndingButton}
+						action={handleAdd}
+					/>
+				</div>
+			)}
+		</div>
+	);
+});

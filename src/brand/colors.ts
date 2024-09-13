@@ -31,7 +31,7 @@ export const Colors = {
 		edge: '#ccc',
 	},
 	text: {
-		t4: '#CACACA',
+		t4: '#BABABA',
 		t3: '#ABABAB',
 		t2: '#626262',
 		t1: '#343434',

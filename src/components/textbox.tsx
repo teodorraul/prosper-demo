@@ -1,21 +1,21 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import {
-	TextboxContainerStyle,
-	TextboxStyle,
-	TextFieldStyle,
-} from './textbox.css';
+import { RecipeVariants } from '@vanilla-extract/recipes';
 
-export const Textbox: React.FC<{
-	placeholder: string;
-	autofocus?: boolean;
-	autofocusIfEmpty?: boolean;
-	remoteValue: string | undefined;
-	className: string;
-	onChange?: (value: string, ev: any) => void;
-	onDelayedChange: (value: string) => void;
-	area?: boolean;
-}> = ({
+import { TextboxContainerStyle, TextboxStyle, TextFieldStyle } from './textbox.css';
+
+export const Textbox: React.FC<
+	{
+		placeholder: string;
+		autofocus?: boolean;
+		autofocusIfEmpty?: boolean;
+		remoteValue: string | undefined;
+		className: string;
+		onChange?: (value: string, ev: any) => void;
+		onDelayedChange: (value: string, ref: any) => void;
+		area?: boolean;
+	} & RecipeVariants<typeof TextFieldStyle>
+> = ({
 	remoteValue,
 	placeholder,
 	autofocusIfEmpty,
@@ -24,9 +24,11 @@ export const Textbox: React.FC<{
 	onDelayedChange,
 	className,
 	area,
+	context = 'default',
+	...props
 }) => {
 	const ref = useRef<HTMLTextAreaElement | HTMLInputElement>(null);
-	const [value, setValue] = useState<string | undefined>(undefined);
+	const [value, setValue] = useState<string | undefined>('');
 	const [_, setIsFocused] = useState(false);
 	const _value = useRef<string | undefined>(undefined);
 	const _isFocused = useRef<boolean>(false);
@@ -45,7 +47,7 @@ export const Textbox: React.FC<{
 
 			_throttleTimer.current = setTimeout(() => {
 				if (_value.current !== undefined) {
-					onDelayedChange?.(_value.current);
+					onDelayedChange?.(_value.current, ref.current);
 				}
 			}, 800);
 		},
@@ -102,19 +104,23 @@ export const Textbox: React.FC<{
 				<textarea
 					value={value}
 					ref={ref}
-					className={`${TextboxStyle} ${className}`}
+					placeholder={placeholder}
+					className={`${TextboxStyle({ context })} ${className}`}
 					onChange={handleChange}
 					onFocus={handleFocus}
 					onBlur={handleBlur}
+					{...props}
 				></textarea>
 			) : (
 				<input
 					value={value}
 					ref={ref}
-					className={`${TextFieldStyle} ${className}`}
+					placeholder={placeholder}
+					className={`${TextFieldStyle({ context })} ${className}`}
 					onChange={handleChange}
 					onFocus={handleFocus}
 					onBlur={handleBlur}
+					{...props}
 				/>
 			)}
 		</div>

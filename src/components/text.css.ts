@@ -14,6 +14,10 @@ export const TextStyle = recipe({
 				fontSize: 44,
 				fontFamily: Playfair,
 			},
+			smallTitle: {
+				fontSize: 25,
+				fontFamily: Playfair,
+			},
 			microtitle: {
 				fontSize: 11,
 				lineHeight: '1em',

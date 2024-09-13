@@ -8,13 +8,9 @@ import { useStore } from 'src/store/useStore';
 
 import { useNodeDetails } from './agentEditorNode.hooks';
 import {
-	AgentEditorSidebarCardStyle,
-	AgentEditorSidebarIndentedTextStyle,
+    AgentEditorSidebarCardStyle, AgentEditorSidebarIndentedTextStyle
 } from './agentEditorSidebar.css';
-import {
-	AESCNodeConditionStyle,
-	AESCNodeNodeNameStyle,
-} from './agentEditorSidebarContentNode.css';
+import { AESCNodeConditionStyle, AESCNodeNodeNameStyle } from './agentEditorSidebarContentNode.css';
 
 export const AESCNode: React.FC<{ nodeId: string }> = observer(({ nodeId }) => {
 	const store = useStore();
@@ -40,8 +36,8 @@ export const AESCNode: React.FC<{ nodeId: string }> = observer(({ nodeId }) => {
 				<Textbox
 					className={AESCNodeNodeNameStyle}
 					remoteValue={details?.nodeName}
-					placeholder="Describe the agent's characteristics, i.e. where she's working it, etc."
-					autofocusIfEmpty
+					placeholder="function_name>"
+					// autofocusIfEmpty
 					onDelayedChange={handleDelayedNameChange}
 				/>
 			</div>
@@ -52,7 +48,7 @@ export const AESCNode: React.FC<{ nodeId: string }> = observer(({ nodeId }) => {
 					className={`${AESCNodeConditionStyle}`}
 					remoteValue={details?.nodeEnterCondition}
 					placeholder="Describe the agent's characteristics, i.e. where she's working it, etc."
-					autofocusIfEmpty
+					// autofocusIfEmpty
 					onDelayedChange={handleDelayedConditionChange}
 				/>
 			</div>
@@ -61,8 +57,11 @@ export const AESCNode: React.FC<{ nodeId: string }> = observer(({ nodeId }) => {
 					TIP: Start with "If the user says" and end with ", call this
 					function.
 				</Text>
+				<Text level="tiny" color="subtle">
+					Node #{details?.order}
+				</Text>
 			</div>
-			<DataExtractionPanel userData={details?.userData} />
+			<DataExtractionPanel nodeId={nodeId} userData={details?.userData} />
 			<div />
 		</>
 	);

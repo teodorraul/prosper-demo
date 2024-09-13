@@ -1,11 +1,10 @@
 import { AgentEditorNodeUserData } from 'src/store/agents.types';
+import { MTSNEReturnDataExtractionId } from 'src/utils/methodsThatShouldNotExist';
 import { capitalize } from 'src/utils/strings';
 
 import {
-	NodeDataExtractsContainerStyle,
-	NodeDataExtractsLabelStyle,
-	NodeDataExtractsRowStyle,
-	NodeDataExtractsSquareStyle,
+    NodeDataExtractsContainerStyle, NodeDataExtractsLabelStyle, NodeDataExtractsRowStyle,
+    NodeDataExtractsSquarePos, NodeDataExtractsSquareStyle
 } from './nodeDataExtracts.css';
 import { Text } from './text';
 
@@ -17,9 +16,14 @@ export const NodeDataExtracts: React.FC<{
 			<Text level="microtitle">Extract Data</Text>
 			{items.map((n) => {
 				return (
-					<div className={NodeDataExtractsRowStyle}>
-						<span className={NodeDataExtractsSquareStyle}>
-							{n.dataType[0]}
+					<div
+						className={NodeDataExtractsRowStyle}
+						key={MTSNEReturnDataExtractionId(n)}
+					>
+						<span
+							className={`${NodeDataExtractsSquareStyle} ${NodeDataExtractsSquarePos}`}
+						>
+							{n.dataType?.[0]}
 						</span>
 						<span className={NodeDataExtractsLabelStyle}>
 							{capitalize(n.name.replaceAll('_', ' '))}

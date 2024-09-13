@@ -1,27 +1,74 @@
 import { Inter } from 'src/brand/typography.css';
 
 import { keyframes, style } from '@vanilla-extract/css';
+import { recipe } from '@vanilla-extract/recipes';
 
-export const TextboxStyle = style({
-	margin: 0,
-	padding: 0,
-	border: 'none',
-	width: '100%',
-	fontSize: 13,
-	fontFamily: Inter,
-	paddingBottom: 10,
-	lineHeight: '1.5em',
-	margin: 0,
+export const TextboxStyle = recipe({
+	base: {
+		margin: 0,
+		padding: 0,
+		border: 'none',
+		width: '100%',
+		fontSize: 13,
+		fontFamily: Inter,
+		backgroundColor: 'transparent',
+		paddingBottom: 10,
+		resize: 'vertical',
+		lineHeight: '1.5em',
+	},
+	variants: {
+		context: {
+			default: {},
+			editorSidebar: {
+				borderRadius: 8,
+				padding: '8px 15px',
+				':hover': {
+					background: 'rgba(0,0,0,0.05)',
+				},
+				':active': {
+					background: 'rgba(0,0,0,0.1)',
+				},
+				':focus': {
+					background: 'rgba(0,0,0,0.1)',
+				},
+			},
+			editorSidebarCard: {},
+		},
+	},
 });
 
-export const TextFieldStyle = style({
-	margin: 0,
-	padding: 0,
-	border: 'none',
-	width: '100%',
-	fontSize: 13,
-	fontFamily: Inter,
-	lineHeight: '1em',
+export const TextFieldStyle = recipe({
+	base: {
+		margin: 0,
+		padding: '7px 0',
+		border: 'none',
+		width: '100%',
+		fontSize: 13,
+		backgroundColor: 'transparent',
+		fontFamily: Inter,
+		lineHeight: '1em',
+	},
+	variants: {
+		context: {
+			default: {},
+			editorSidebar: {
+				borderRadius: 8,
+				padding: '8px 15px',
+				fontWeight: 'bold',
+				background: 'rgba(0,0,0,0.05)',
+				':hover': {
+					background: 'rgba(0,0,0,0.1)',
+				},
+				':active': {
+					background: 'rgba(0,0,0,0.1)',
+				},
+				':focus': {
+					background: 'rgba(0,0,0,0.1)',
+				},
+			},
+			editorSidebarCard: {},
+		},
+	},
 });
 
 const Breath = keyframes({

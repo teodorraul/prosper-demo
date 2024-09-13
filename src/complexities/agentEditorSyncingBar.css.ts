@@ -5,10 +5,10 @@ import { style } from '@vanilla-extract/css';
 export const AgentEditorSyncingBarStyle = style({
 	padding: '5px 12px',
 	position: 'fixed',
-	top: 20,
-	right: 20,
+	bottom: 20,
+	left: 20,
 	borderRadius: 10,
-	backdropFilter: Colors.panels.blur,
-	backgroundColor: Colors.panels.background,
+	color: 'white',
+	backgroundColor: Colors.text.r,
 	boxShadow: Colors.panels.shadows,
 });

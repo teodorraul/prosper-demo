@@ -4,9 +4,7 @@ import { AgentWorkflowNode, RemoteAgentEditorNode } from './agents.types';
 
 export type AEEdge = Edge<{}>;
 export type AENode = Node<{
-	// id: number;
-	// type: "node";
-	// position: XYPosition;
+	needsEnding: boolean;
 }>;
 
 export type AENodePlusParent = AENode & {

@@ -25,6 +25,7 @@ export const AgentEditorSidebarStyle = style({
 	alignItems: 'stretch',
 	rowGap: 10,
 	flexGrow: 1,
+	overflow: 'scroll',
 	backdropFilter: Colors.panels.blur,
 	backgroundColor: 'rgba(217,229,232, 0.85)',
 	boxShadow:
@@ -35,8 +36,9 @@ export const AgentEditorSidebarTitleStyle = style({
 	fontSize: '43px',
 	fontFamily: Playfair,
 	letterSpacing: '-0.75px',
-	lineHeight: '1em',
+	lineHeight: '1.1em',
 	margin: 5,
+	marginBottom: 12,
 	color: Colors.text.r,
 });
 
@@ -52,4 +54,8 @@ export const AgentEditorSidebarCardStyle = style({
 
 export const AgentEditorSidebarIndentedTextStyle = style({
 	padding: '3px 5px',
+	display: 'flex',
+	flexDirection: 'column',
+	alignItems: 'flex-start',
+	rowGap: 8,
 });
