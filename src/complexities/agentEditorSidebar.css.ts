@@ -1,49 +1,55 @@
 import { Colors } from 'src/brand/colors';
+import { Playfair } from 'src/brand/typography.css';
 
 import { style } from '@vanilla-extract/css';
 
 export const AgentEditorSidebarContainerStyle = style({
-	width: "50vw",
+	width: '50vw',
 	maxWidth: 500,
-	position: "fixed",
-	bottom: 0,
+	height: '100vh',
+	position: 'fixed',
+	top: 0,
 	right: 0,
+	display: 'flex',
+	flexDirection: 'column',
 });
 
 export const AgentEditorSidebarStyle = style({
 	margin: 20,
-	marginBottom: 0,
-	padding: '10px 15px',
+	padding: '25px 35px',
 	paddingBottom: 17,
-	borderRadius: '20px 20px 0 0',
-	willChange: "transform",
-	display: "flex",
-	flexDirection: "column",
-	alignItems: "flex-start",
+	borderRadius: '20px',
+	willChange: 'transform',
+	display: 'flex',
+	flexDirection: 'column',
+	alignItems: 'stretch',
 	rowGap: 10,
+	flexGrow: 1,
 	backdropFilter: Colors.panels.blur,
-	backgroundColor: "rgba(207,219,222, 0.85)",
-	boxShadow: Colors.panels.shadows,
+	backgroundColor: 'rgba(217,229,232, 0.85)',
+	boxShadow:
+		'0px 0px 0px 0.5px inset rgba(20,35,50,0.33), 0 15px 30px -10px rgba(40,50,60,0.6)',
 });
 
 export const AgentEditorSidebarTitleStyle = style({
-	backgroundColor: Colors.main.r,
-	padding: "5px 10px",
-	textTransform: "uppercase",
-	borderRadius: "10px",
-	fontSize: "10px",
-	letterSpacing: "0.2px",
-	lineHeight: "1em",
-	margin: 0,
-	marginTop: 5,
-	color: '#fff'
+	fontSize: '43px',
+	fontFamily: Playfair,
+	letterSpacing: '-0.75px',
+	lineHeight: '1em',
+	margin: 5,
+	color: Colors.text.r,
 });
 
 export const AgentEditorSidebarCardStyle = style({
-	backgroundColor: "white",
-	padding: "20px",
-	textTransform: "uppercase",
-	borderRadius: "16px",
-	boxShadow: "0px 2px 3px rgba(10,20,30,0.1), 0px 1px 2px 1px rgba(10,20,30,0.1)",
-	alignSelf: "stretch",
+	backgroundColor: 'white',
+	padding: '16px 20px 12px 20px',
+	textTransform: 'uppercase',
+	borderRadius: '16px',
+	boxShadow:
+		'0px 2px 3px rgba(10,20,30,0.1), 0px 1px 2px 1px rgba(10,20,30,0.1)',
+	alignSelf: 'stretch',
+});
+
+export const AgentEditorSidebarIndentedTextStyle = style({
+	padding: '3px 5px',
 });

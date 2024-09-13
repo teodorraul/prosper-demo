@@ -33,13 +33,18 @@ export type EditorAction =
 			details: RemoteAgentEditorNode;
 	  }
 	| {
+			type: 'update-node';
+			nodeId: string | undefined;
+			details: RemoteAgentEditorNode;
+	  }
+	| {
 			type: 'remove-node';
 			nodeId: string;
 	  }
-	  | {
-			  type: 'prompt-updated';
-			  value: string | undefined
-		};
+	| {
+			type: 'prompt-updated';
+			value: string | undefined;
+	  };
 
 export type HoveredNode = {
 	id: string;
@@ -59,8 +64,8 @@ export type SyncOperation =
 	  }
 	| {
 			operation: 'update-prompt';
-			prompt: string | undefined
-			id: string
-	}
+			prompt: string | undefined;
+			id: string;
+	  };
 
 export type ActionSource = 'default' | 'undo' | 'redo' | 'skip';

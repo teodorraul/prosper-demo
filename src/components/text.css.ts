@@ -20,6 +20,10 @@ export const TextStyle = recipe({
 				marginBottom: '3px',
 				textTransform: 'uppercase',
 			},
+			tiny: {
+				fontSize: 12,
+				lineHeight: '1em',
+			},
 			body: {
 				fontSize: 13,
 				margin: 0,
@@ -29,6 +33,7 @@ export const TextStyle = recipe({
 		color: {
 			text: {},
 			subtle: { color: Colors.text.t2 },
+			barelyVisible: { color: Colors.text.t4 },
 		},
 		oneLine: {
 			true: {
@@ -39,8 +44,8 @@ export const TextStyle = recipe({
 		},
 		pre: {
 			true: {
-				whiteSpace: 'pre-wrap'
-			}
+				whiteSpace: 'pre-wrap',
+			},
 		},
 		ctx: {
 			default: {},
@@ -54,10 +59,9 @@ export const TextStyle = recipe({
 				level: 'title',
 			},
 			style: {
-				color: Colors.text.r,
 				fontFamily: Inter,
 				fontWeight: 'bold',
-				fontSize: 15
+				fontSize: 15,
 			},
 		},
 		{
@@ -68,7 +72,6 @@ export const TextStyle = recipe({
 			style: {
 				fontSize: 13,
 				lineHeight: '1.5em',
-				color: Colors.text.t2,
 			},
 		},
 	],

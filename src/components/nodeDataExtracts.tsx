@@ -2,8 +2,10 @@ import { AgentEditorNodeUserData } from 'src/store/agents.types';
 import { capitalize } from 'src/utils/strings';
 
 import {
-    NodeDataExtractsContainerStyle, NodeDataExtractsLabelStyle, NodeDataExtractsRowStyle,
-    NodeDataExtractsSquareStyle
+	NodeDataExtractsContainerStyle,
+	NodeDataExtractsLabelStyle,
+	NodeDataExtractsRowStyle,
+	NodeDataExtractsSquareStyle,
 } from './nodeDataExtracts.css';
 import { Text } from './text';
 
@@ -20,7 +22,7 @@ export const NodeDataExtracts: React.FC<{
 							{n.dataType[0]}
 						</span>
 						<span className={NodeDataExtractsLabelStyle}>
-							{capitalize(n.name.replaceAll("_", " "))}
+							{capitalize(n.name.replaceAll('_', ' '))}
 						</span>
 					</div>
 				);

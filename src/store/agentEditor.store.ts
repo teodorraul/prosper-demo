@@ -4,13 +4,33 @@ import { v4 as uuid } from 'uuid';
 import { node } from 'webpack';
 
 import Dagre from '@dagrejs/dagre';
-import { EdgeChange, NodeChange, NodeDimensionChange, Viewport } from '@xyflow/react';
+import {
+	EdgeChange,
+	NodeChange,
+	NodeDimensionChange,
+	Viewport,
+} from '@xyflow/react';
 
 import {
-    ActionSource, AEEdge, AENode, EditorAction, HoveredNode, MountStatus, SyncOperation
+	ActionSource,
+	AEEdge,
+	AENode,
+	EditorAction,
+	HoveredNode,
+	MountStatus,
+	SyncOperation,
 } from './agentEditor.types';
-import { getChildrenNodeIds, getNextPositions, getNodesParentId } from './agentEditor.utils';
-import { Agent, AgentWorkflowNode, RemoteAgentEditorNode } from './agents.types';
+import {
+	getChildrenNodeIds,
+	getNextPositions,
+	getNodesParentId,
+} from './agentEditor.utils';
+import {
+	Agent,
+	AgentWorkflowNode,
+	RAENodePayload,
+	RemoteAgentEditorNode,
+} from './agents.types';
 import Store from './root.store';
 
 export class AgentEditorStore {
@@ -87,40 +107,44 @@ export class AgentEditorStore {
 		let promises = [];
 		for (const op of queue) {
 			promises.push(
-				new Promise<{ error: string | undefined, id: string }>(async (res, rej) => {
-					const { error } = await Store.agents.applyAgentOp(
-						agentId,
-						op,
-						(op) => {
-							let newOp = Store.agentEditor.syncQueue.find(o => o.id == op.id)
-							return newOp !== op
+				new Promise<{ error: string | undefined; id: string }>(
+					async (res, rej) => {
+						const { error } = await Store.agents.applyAgentOp(
+							agentId,
+							op,
+							(op) => {
+								let newOp = Store.agentEditor.syncQueue.find(
+									(o) => o.id == op.id
+								);
+								return newOp !== op;
+							}
+						);
+						if (!error) {
+							res({ error: undefined, id: op.id });
+							return;
+						} else {
+							res({ error: error, id: op.id });
+							return;
 						}
-					);
-					if (!error) {
-						res({ error: undefined, id: op.id });
-						return;
-					} else {
-						res({ error: error, id: op.id });
-						return;
 					}
-				})
+				)
 			);
 		}
 
 		try {
 			let ops = await Promise.all(promises);
-			let completedOps = []
+			let completedOps = [];
 			for (const op of ops) {
 				if (!op.error) {
-					completedOps.push(op.id)
+					completedOps.push(op.id);
 				}
 			}
 
 			this.removeCompletedOps(completedOps);
-			
-			this.setSyncing(false);	
+
+			this.setSyncing(false);
 		} catch {
-			this.setSyncing(false);	
+			this.setSyncing(false);
 		}
 	};
 
@@ -144,13 +168,13 @@ export class AgentEditorStore {
 		const removedNodesIds: string[] = [];
 		const opEdges: AEEdge[] = [];
 		const nodeDetails: AgentWorkflowNode[] = [];
-		let pendingPrompt: string | undefined = undefined
+		let pendingPrompt: string | undefined = undefined;
 
 		for (const op of this.syncQueue) {
 			switch (op.operation) {
 				case 'update-prompt':
-					pendingPrompt = op.prompt
-					break
+					pendingPrompt = op.prompt;
+					break;
 				case 'upsert-node':
 					opNodes.push({
 						id: op.nodeDetails.id,
@@ -161,12 +185,14 @@ export class AgentEditorStore {
 
 					let nodeBootstrap: RemoteAgentEditorNode = {
 						id: op.nodeDetails.id,
-						node_enter_condition: '',
-						node_name: '',
-						node_type: 'default',
-						prompt: '',
-						is_global: false,
-						user_data: [],
+						node_enter_condition:
+							op.nodeDetails.nodeEnterCondition ?? '',
+						node_name: op.nodeDetails.nodeName ?? '',
+						node_type: op.nodeDetails.nodeType ?? '',
+						prompt: op.nodeDetails.prompt ?? '',
+						is_global: op.nodeDetails.isGlobal ?? false,
+						user_data:
+							op.nodeDetails.serializedUserDataForSupa ?? [],
 					};
 					nodeDetails.push(new AgentWorkflowNode(nodeBootstrap));
 
@@ -187,12 +213,23 @@ export class AgentEditorStore {
 					removedNodesIds.push(op.id);
 			}
 		}
-		return { opNodes, opEdges, nodeDetails, removedNodesIds, pendingPrompt };
+		return {
+			opNodes,
+			opEdges,
+			nodeDetails,
+			removedNodesIds,
+			pendingPrompt,
+		};
 	};
 
 	buildStateFrom = async (agent: Agent) => {
-		const { opNodes, opEdges, nodeDetails, removedNodesIds, pendingPrompt } =
-			this.getOverrideFromOperations();
+		const {
+			opNodes,
+			opEdges,
+			nodeDetails,
+			removedNodesIds,
+			pendingPrompt,
+		} = this.getOverrideFromOperations();
 
 		this.nodeDetails.replace({});
 
@@ -244,9 +281,15 @@ export class AgentEditorStore {
 
 		for (let node of agent.workflow.nodes) {
 			this.nodeDetails.set(node.id, node);
+			if (node.id == '6d8f3667-fecf-4b96-ad99-f140e2164c69') {
+				console.log('remote:', node);
+			}
 		}
 		for (let node of nodeDetails) {
 			this.nodeDetails.set(node.id, node);
+			if (node.id == '6d8f3667-fecf-4b96-ad99-f140e2164c69') {
+				console.log('local:', node);
+			}
 		}
 
 		const { layoutedEdges, layoutedNodes } = this.layoutTree(
@@ -256,7 +299,7 @@ export class AgentEditorStore {
 
 		this.setNodesAndEdges(layoutedNodes, layoutedEdges);
 
-		this.prompt = pendingPrompt ?? agent.workflow.generalInstructions
+		this.prompt = pendingPrompt ?? agent.workflow.generalInstructions;
 	};
 
 	relayoutNodes = async () => {
@@ -379,7 +422,6 @@ export class AgentEditorStore {
 		this.status = status;
 	}
 
-
 	@action.bound
 	selectNode(id: string | undefined, from: ActionSource = 'default') {
 		this.handleOpUndoRedo(from, {
@@ -439,6 +481,42 @@ export class AgentEditorStore {
 	}
 
 	@action.bound
+	updateNode(
+		nodeId: string,
+		delta?: Partial<RAENodePayload>,
+		from: ActionSource = 'default'
+	) {
+		let existing = this.nodeDetails.get(nodeId);
+		let parent = getNodesParentId(nodeId, this.edges);
+
+		if (!existing) {
+			console.error('node details existing is undefined');
+			return;
+		}
+
+		this.handleOpUndoRedo(from, {
+			type: 'update-node',
+			nodeId: nodeId,
+			details: existing.serializedForSupa,
+		});
+
+		let newNode = { ...existing.serializedForSupa, ...delta };
+
+		this.syncQueue.push({
+			operation: 'upsert-node',
+			id: uuid(),
+			parentId: parent,
+			nodeDetails: new AgentWorkflowNode(newNode),
+		});
+
+		for (const q of this.syncQueue) {
+			if (q.operation == 'delete-node' && q.id == nodeId) {
+				this.syncQueue.remove(q);
+			}
+		}
+	}
+
+	@action.bound
 	removeNode(nodeId: string, from: ActionSource = 'default') {
 		let nodeDetails = this.nodeDetails.get(nodeId);
 		const parentId = getNodesParentId(nodeId, this.edges);
@@ -479,29 +557,34 @@ export class AgentEditorStore {
 		}
 	};
 
-
 	@action.bound
 	setPrompt(value: string | undefined) {
-		this.prompt = value
+		this.prompt = value;
 	}
 
 	@action.bound
-	notifyPromptUpdated(value: string | undefined, from: ActionSource = 'default') {
+	notifyPromptUpdated(
+		value: string | undefined,
+		from: ActionSource = 'default'
+	) {
 		this.handleOpUndoRedo(from, {
 			type: 'prompt-updated',
-			value: this.prompt
+			value: this.prompt,
 		});
 
-		this.prompt = value
+		this.prompt = value;
 
 		for (const q of this.syncQueue) {
 			if (q.operation == 'update-prompt') {
 				this.syncQueue.remove(q);
 			}
 		}
-		this.syncQueue.push({ operation: 'update-prompt', prompt: this.prompt, id: uuid() });
+		this.syncQueue.push({
+			operation: 'update-prompt',
+			prompt: this.prompt,
+			id: uuid(),
+		});
 	}
-
 
 	executeAction = (action: EditorAction | undefined, from: ActionSource) => {
 		switch (action?.type) {
@@ -517,8 +600,8 @@ export class AgentEditorStore {
 				);
 				return;
 			case 'prompt-updated':
-				this.notifyPromptUpdated(action.value, from)
-				return
+				this.notifyPromptUpdated(action.value, from);
+				return;
 			case 'remove-node':
 				this.removeNode(action.nodeId, from);
 		}

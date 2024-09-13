@@ -16,9 +16,7 @@ export const useAgentEditorNodeFormattedDetails = (
 
 	const formattedDescription = useMemo(() => {
 		let desc = node?.nodeEnterCondition ?? '';
-		let summary =
-			desc.split('user')[1]?.split(', call this')[0] ||
-			'Lacks description';
+		let summary = desc.split('user')[1]?.split(', call this')[0] || desc;
 		return capitalize(summary.trim(), true);
 	}, [node?.nodeEnterCondition]);
 

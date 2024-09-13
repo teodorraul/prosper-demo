@@ -7,19 +7,19 @@ export const AgentEditorChartStyle = style({
 });
 
 export const AgentEditorStyle = style({
-	width: "100vw",
-	height: "100vh",
-	display: "flex",
-	flexDirection: "row",
+	width: '100vw',
+	height: '100vh',
+	display: 'flex',
+	flexDirection: 'row',
 });
 
 export const AgentEditorHeader = style({
-	position: "fixed",
+	position: 'fixed',
 	left: 15,
 	top: 15,
 	padding: 8,
-	display: "flex",
-	alignItems: "center",
+	display: 'flex',
+	alignItems: 'center',
 	zIndex: 1000,
 	borderRadius: 15,
 	backdropFilter: Colors.panels.blur,

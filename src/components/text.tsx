@@ -7,7 +7,7 @@ import { TextStyle } from './text.css';
 export const Text: React.FC<
 	{
 		children: ReactElement | string;
-		pre: boolean;
+		pre?: boolean;
 	} & RecipeVariants<typeof TextStyle>
 > = ({
 	level = 'body',

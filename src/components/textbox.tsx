@@ -1,6 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import { TextboxContainerStyle, TextboxStyle } from './textbox.css';
+import {
+	TextboxContainerStyle,
+	TextboxStyle,
+	TextFieldStyle,
+} from './textbox.css';
 
 export const Textbox: React.FC<{
 	placeholder: string;
@@ -8,8 +12,9 @@ export const Textbox: React.FC<{
 	autofocusIfEmpty?: boolean;
 	remoteValue: string | undefined;
 	className: string;
-	onChange: (value: string, ev: any) => void;
+	onChange?: (value: string, ev: any) => void;
 	onDelayedChange: (value: string) => void;
+	area?: boolean;
 }> = ({
 	remoteValue,
 	placeholder,
@@ -18,8 +23,9 @@ export const Textbox: React.FC<{
 	autofocus,
 	onDelayedChange,
 	className,
+	area,
 }) => {
-	const ref = useRef<HTMLTextAreaElement>(null);
+	const ref = useRef<HTMLTextAreaElement | HTMLInputElement>(null);
 	const [value, setValue] = useState<string | undefined>(undefined);
 	const [_, setIsFocused] = useState(false);
 	const _value = useRef<string | undefined>(undefined);
@@ -92,15 +98,25 @@ export const Textbox: React.FC<{
 
 	return (
 		<div className={TextboxContainerStyle}>
-			<textarea
-				value={value}
-				ref={ref}
-				placeholder={placeholder}
-				className={`${TextboxStyle} ${className}`}
-				onChange={handleChange}
-				onFocus={handleFocus}
-				onBlur={handleBlur}
-			></textarea>
+			{area ? (
+				<textarea
+					value={value}
+					ref={ref}
+					className={`${TextboxStyle} ${className}`}
+					onChange={handleChange}
+					onFocus={handleFocus}
+					onBlur={handleBlur}
+				></textarea>
+			) : (
+				<input
+					value={value}
+					ref={ref}
+					className={`${TextFieldStyle} ${className}`}
+					onChange={handleChange}
+					onFocus={handleFocus}
+					onBlur={handleBlur}
+				/>
+			)}
 		</div>
 	);
 };

@@ -166,6 +166,16 @@ export class AgentWorkflowNode {
 			user_data: data,
 		};
 	}
+
+	get serializedUserDataForSupa(): RemoteAgentEditorNodeUserData[] {
+		let data: RemoteAgentEditorNodeUserData[] = [];
+
+		for (const i of this.userData) {
+			data.push(i.serializedForSupa);
+		}
+
+		return data;
+	}
 }
 
 export class AgentEditorNodeUserData {
@@ -219,6 +229,7 @@ export type RemoteAgentEditorNode = {
 	user_data: RemoteAgentEditorNodeUserData[];
 };
 
+export type RAENodePayload = Omit<RemoteAgentEditorNode, 'id'>;
 type DeprecatedNodeTypes = 'transfer_call';
 export type RemoteNodeType =
 	| 'default'

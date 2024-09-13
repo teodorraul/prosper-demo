@@ -61,7 +61,14 @@ module.exports = {
 						options: {
 							url: false,
 						},
-					},
+					},{
+						loader: 'postcss-loader',
+						options: {
+						  postcssOptions: {
+							config: './postcss.config.js',
+						  },
+						},
+					  },
 				],
 			},
 		],

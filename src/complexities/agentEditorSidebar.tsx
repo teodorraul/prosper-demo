@@ -21,16 +21,21 @@ export const AgentEditorSidebar = observer(() => {
 		useAgentEditorNodeFormattedDetails(selectedNodeDetails);
 
 	return (
-		<aside className={AgentEditorSidebarContainerStyle}>
+		<aside className={`${AgentEditorSidebarContainerStyle} editor-sidebar`}>
 			{selectedNodeDetails && (
 				<div className={AgentEditorSidebarStyle}>
 					<h5 className={AgentEditorSidebarTitleStyle}>
 						{formattedTitle}
 					</h5>
 					{selectedNodeDetails?.nodeType == 'start_call' && (
-						<AESCRootNode />
+						<AESCRootNode key={selectedNodeId} />
 					)}
-					{selectedNodeDetails?.nodeType == 'default' && <AESCNode />}
+					{selectedNodeDetails?.nodeType == 'default' && (
+						<AESCNode
+							nodeId={selectedNodeId}
+							key={selectedNodeId}
+						/>
+					)}
 				</div>
 			)}
 		</aside>
