@@ -5,7 +5,7 @@ import { getNodesBounds, useReactFlow } from '@xyflow/react';
 
 import { useRenderedNode } from './agentEditorNode.hooks';
 
-const MOVE_TIME = 500;
+const MOVE_TIME = 800;
 export const useAgentEditorSpanner = () => {
 	const store = useStore();
 	let flow = useReactFlow();

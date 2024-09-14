@@ -1,7 +1,6 @@
 import deepEqual from 'deep-equal';
 import { action, IObservableArray, observable, reaction, toJS } from 'mobx';
 import { v4 as uuid } from 'uuid';
-import { node } from 'webpack';
 
 import Dagre from '@dagrejs/dagre';
 import {
@@ -276,16 +275,10 @@ export class AgentEditorStore {
 			unlayoutedNodes = unlayoutedNodes.filter((e) => e.id != id);
 		}
 
-		for (let node of agent.workflow.nodes) {
-			this.nodeDetails.set(node.id, node);
-			if (node.id == '6d8f3667-fecf-4b96-ad99-f140e2164c69') {
-				console.log('remote:', node);
-			}
-		}
-		for (let node of nodeDetails) {
-			this.nodeDetails.set(node.id, node);
-			if (node.id == '6d8f3667-fecf-4b96-ad99-f140e2164c69') {
-				console.log('local:', node);
+		for (let node of [...nodeDetails, ...agent.workflow.nodes]) {
+			let existing = this.nodeDetails.get(node.id);
+			if (!deepEqual(existing, node)) {
+				this.nodeDetails.set(node.id, node);
 			}
 		}
 
@@ -462,8 +455,12 @@ export class AgentEditorStore {
 
 	@action.bound
 	setNodesAndEdges(nodes: AENode[], edges: AEEdge[]) {
-		this.nodes = nodes;
-		this.edges = edges;
+		if (!deepEqual(nodes, this.nodes)) {
+			this.nodes = nodes;
+		}
+		if (!deepEqual(nodes, this.edges)) {
+			this.edges = edges;
+		}
 	}
 
 	@action.bound
@@ -603,10 +600,10 @@ export class AgentEditorStore {
 		}
 		this.syncQueue.push({ operation: 'delete-node', id: nodeId });
 
-		// let parent = getNodesParentId(nodeId, this.edges);
-		// if (parent) {
-		// 	this.selectNode(parent, 'skip');
-		// }
+		let parent = getNodesParentId(nodeId, this.edges);
+		if (parent) {
+			this.selectNode(parent, 'skip');
+		}
 	}
 
 	handleOpUndoRedo = (from: ActionSource, reverseAction: EditorAction) => {

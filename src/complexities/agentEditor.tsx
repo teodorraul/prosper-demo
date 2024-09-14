@@ -8,7 +8,6 @@ import { Logo } from 'src/components/logo';
 import { useClickHandler } from 'src/hooks/useClickHandler';
 import { useAgentEditor } from 'src/store/agentEditor.hooks';
 import { useStore } from 'src/store/useStore';
-import { node } from 'webpack';
 
 import { Background, BackgroundVariant, ReactFlow } from '@xyflow/react';
 
@@ -82,8 +81,6 @@ export const AgentEditor = observer(() => {
 			) {
 				return;
 			}
-			// store.ui.setLeftPanelOpen(undefined);
-			// store.ui.setRightPanelOpen(undefined);
 		};
 
 		document.addEventListener('click', handleClick);
@@ -92,7 +89,6 @@ export const AgentEditor = observer(() => {
 		};
 	}, []);
 
-	// const nodesInitialized = useNodesInitialized();
 	const store = useStore();
 
 	const handleClick = useClickHandler(
@@ -102,12 +98,6 @@ export const AgentEditor = observer(() => {
 		},
 		[store]
 	);
-
-	// useEffect(() => {
-	// 	if (nodesInitialized) {
-	// 		store.agentEditor.relayoutNodes();
-	// 	}
-	// }, [nodesInitialized, store]);
 
 	useAgentEditor(agentId);
 	useAgentEditorSpanner();
