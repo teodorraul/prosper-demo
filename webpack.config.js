@@ -11,7 +11,7 @@ module.exports = {
 	output: {
 		filename: 'bundle.[fullhash].js',
 		path: path.resolve(__dirname, 'dist'),
-		publicPath: process.env.IS_DEVELOPMENT ? '/' : '/zzz/prosp/',
+		publicPath: process.env.IS_DEVELOPMENT ? "/" : process.env.SUBDIR,
 	},
 	devServer: {
 		historyApiFallback: true,
@@ -31,6 +31,10 @@ module.exports = {
 				process.env.SUPABASE_ANON_KEY
 			),
 			'process.env.IS_DEVELOPMENT': process.env.IS_DEVELOPMENT,
+			// This enables `/subdir/<APP>` as root deployments
+			'process.env.ROOT_PATH': JSON.stringify(
+				process.env.SUBDIR
+			)
 		}),
 		new VanillaExtractPlugin(),
 		new MiniCssExtractPlugin(),

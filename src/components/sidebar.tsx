@@ -3,11 +3,16 @@ import '../brand/globalStyles.css';
 import { NavLink } from 'react-router-dom';
 
 import { Logo } from './logo';
-import { LogoHolderStyle, SidebarLinkStyle, SidebarNavStyle, SidebarStyle } from './sidebar.css';
+import {
+	LogoHolderStyle,
+	SidebarLinkStyle,
+	SidebarNavStyle,
+	SidebarStyle,
+} from './sidebar.css';
 
 const routes = [
 	{
-		path: '/zzz/prosp/agents',
+		path: `${process.env.ROOT_PATH}/agents`,
 		name: '🧑‍💼 Agents',
 	},
 	{ path: 'another-page', name: 'Another page (TBD)' },

@@ -1,9 +1,15 @@
+console.log(process.env.ROOT_PATH);
+
 import './supabase/index';
 
 import { Provider } from 'mobx-react';
 import React, { lazy, Suspense } from 'react';
 import { createRoot } from 'react-dom/client';
-import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom';
+import {
+	createBrowserRouter,
+	Navigate,
+	RouterProvider,
+} from 'react-router-dom';
 
 import { LoadingScreen } from './components/loadingScreen';
 import { IndexRoutesContainer } from './routes';
@@ -19,12 +25,12 @@ const root = createRoot(rootElement);
 
 const router = createBrowserRouter([
 	{
-		path: '/zzz/prosp',
+		path: `${process.env.ROOT_PATH}`,
 		element: <IndexRoutesContainer />,
 		children: [
 			{
 				path: '',
-				element: <Navigate to="/zzz/prosp/agents" />,
+				element: <Navigate to={`${process.env.ROOT_PATH}/agents`} />,
 			},
 			{
 				path: 'agents',
@@ -37,7 +43,7 @@ const router = createBrowserRouter([
 		],
 	},
 	{
-		path: '/zzz/prosp/agents/:id',
+		path: `${process.env.ROOT_PATH}/agents/:id`,
 		//teo
 		element: (
 			<Suspense fallback={<LoadingScreen />}>

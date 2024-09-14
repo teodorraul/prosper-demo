@@ -12,7 +12,11 @@ import { node } from 'webpack';
 
 import { Background, BackgroundVariant, ReactFlow } from '@xyflow/react';
 
-import { AgentEditorChartStyle, AgentEditorHeader, AgentEditorStyle } from './agentEditor.css';
+import {
+	AgentEditorChartStyle,
+	AgentEditorHeader,
+	AgentEditorStyle,
+} from './agentEditor.css';
 import { useAgentEditorHotkeys } from './agentEditor.hotkeys';
 import { useAgentEditorSpanner } from './agentEditor.spanner';
 import { AgentEditorEdge } from './agentEditorEdge';
@@ -145,7 +149,12 @@ export const AgentEditor = observer(() => {
 	return (
 		<main className={AgentEditorStyle}>
 			<div className={AgentEditorHeader}>
-				<Button title="←" circle type="subtle" to="/zzz/prosp/agents" />
+				<Button
+					title="←"
+					circle
+					type="subtle"
+					to={`${process.env.ROOT_PATH}/agents`}
+				/>
 				<Logo />
 			</div>
 			<ReactFlow

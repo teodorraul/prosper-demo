@@ -4,13 +4,29 @@ import { v4 as uuid } from 'uuid';
 import { node } from 'webpack';
 
 import Dagre from '@dagrejs/dagre';
-import { EdgeChange, NodeChange, NodeDimensionChange, Viewport } from '@xyflow/react';
+import {
+	EdgeChange,
+	NodeChange,
+	NodeDimensionChange,
+	Viewport,
+} from '@xyflow/react';
 
 import {
-    ActionSource, AEEdge, AENode, EditorAction, HoveredNode, MountStatus, SyncOperation
+	ActionSource,
+	AEEdge,
+	AENode,
+	EditorAction,
+	HoveredNode,
+	MountStatus,
+	SyncOperation,
 } from './agentEditor.types';
 import { getNodesParentId } from './agentEditor.utils';
-import { Agent, AgentWorkflowNode, RAENodePayload, RemoteAgentEditorNode } from './agents.types';
+import {
+	Agent,
+	AgentWorkflowNode,
+	RAENodePayload,
+	RemoteAgentEditorNode,
+} from './agents.types';
 import Store from './root.store';
 
 export class AgentEditorStore {
@@ -320,11 +336,17 @@ export class AgentEditorStore {
 		g.setGraph({
 			rankdir: 'TB',
 			align: 'UL',
+			ranker: 'longest-path',
 			ranksep: 120,
 			nodesep: 80,
 		});
 
-		edges.forEach((edge) => g.setEdge(edge.source, edge.target));
+		edges.forEach((edge) => {
+			let targetNode = this.nodeDetails.get(edge.target);
+			g.setEdge(edge.source, edge.target, {
+				weight: targetNode?.order,
+			});
+		});
 
 		nodes.sort(
 			(a, b) =>
