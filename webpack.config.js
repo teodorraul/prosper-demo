@@ -5,7 +5,9 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const webpack = require('webpack');
 const CopyPlugin = require('copy-webpack-plugin');
 
-let isDev = process.env.IS_DEVELOPMENT ?? true;
+let isDev = process.env.IS_DEVELOPMENT
+	? true
+	: process.env.NODE_ENV != 'production';
 let subdir = process.env.SUBDIR ?? '';
 
 module.exports = {
@@ -14,7 +16,7 @@ module.exports = {
 	output: {
 		filename: 'bundle.[fullhash].js',
 		path: path.resolve(__dirname, 'dist'),
-		publicPath: isDev ? '/' : process.env.SUBDIR,
+		publicPath: isDev ? '/' : subdir + '/',
 	},
 	devServer: {
 		historyApiFallback: true,

@@ -20,7 +20,6 @@
 
 -   Add some validation for the function_name
     It's not clear for the user that the function names should be dashed
-
 -   Add a loader while React Suspense fetched the Editor bundle
 -   Add navigation blocking when changes are syncing
     Just to make sure all the changes are save
