@@ -1,5 +1,5 @@
 import deepEqual from 'deep-equal';
-import { action, IObservableArray, observable, reaction, toJS } from 'mobx';
+import { action, IObservableArray, observable, reaction } from 'mobx';
 import { v4 as uuid } from 'uuid';
 
 import Dagre from '@dagrejs/dagre';
@@ -63,16 +63,6 @@ export class AgentEditorStore {
 
 		if (agent) {
 			this.buildStateFrom(agent);
-
-			reaction(
-				() => toJS(Store.agents.byId),
-				() => {
-					let agent = Store.agents.byId.get(agentId);
-					if (agent) {
-						this.buildStateFrom(agent);
-					}
-				}
-			);
 
 			reaction(
 				() => this.syncQueue.slice(),
@@ -337,14 +327,9 @@ export class AgentEditorStore {
 		edges.forEach((edge) => {
 			let targetNode = this.nodeDetails.get(edge.target);
 			g.setEdge(edge.source, edge.target, {
-				weight: targetNode?.order,
+				// weight: targetNode?.order,
 			});
 		});
-
-		nodes.sort(
-			(a, b) =>
-				this.nodeDetails.get(a)?.order > this.nodeDetails.get(b)?.order
-		);
 
 		nodes.forEach((node) =>
 			g.setNode(node.id, {

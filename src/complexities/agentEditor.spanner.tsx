@@ -29,6 +29,7 @@ export const useAgentEditorSpanner = () => {
 				zoom: 1,
 				duration: MOVE_TIME,
 			});
+			console.log(centerX + width / 2, centerY);
 		}
 	}, [flow, node]);
 };
