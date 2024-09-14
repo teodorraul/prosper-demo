@@ -336,8 +336,8 @@ export class AgentEditorStore {
 		g.setGraph({
 			rankdir: 'TB',
 			align: 'UL',
-			ranker: 'longest-path',
-			ranksep: 120,
+			ranker: 'network-simplex',
+			ranksep: 20,
 			nodesep: 80,
 		});
 

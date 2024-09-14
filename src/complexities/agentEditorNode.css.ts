@@ -3,6 +3,16 @@ import { Colors } from 'src/brand/colors';
 import { style } from '@vanilla-extract/css';
 import { recipe } from '@vanilla-extract/recipes';
 
+export const AENPadderStyle = recipe({
+	variants: {
+		canReceiveEndingNode: {
+			true: {
+				marginBottom: 200,
+			},
+		},
+	},
+});
+
 export const AENContainerStyle = style({
 	position: 'relative',
 	color: Colors.text.r,

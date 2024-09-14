@@ -6,8 +6,12 @@ import { useStore } from 'src/store/useStore';
 
 import { useNodeDetails } from './agentEditorNode.hooks';
 import {
-    AENButton, AENButtonEnding, AENButtonLeftSide, AENButtonRightSide, AENButtonsHolder,
-    AENEndingButton
+	AENButton,
+	AENButtonEnding,
+	AENButtonLeftSide,
+	AENButtonRightSide,
+	AENButtonsHolder,
+	AENEndingButton,
 } from './agentEditorNodeButtons.css';
 
 export const AgentEditorNodeButtons: React.FC<{
@@ -32,8 +36,6 @@ export const AgentEditorNodeButtons: React.FC<{
 		[nodeId]
 	);
 
-	const shouldShowFinalNodeButton =
-		details?.nodeType == 'start_call' || details?.nodeType == 'default';
 	return (
 		<div className={AENButtonsHolder}>
 			{hoveredSide === 'left' && (
@@ -58,7 +60,7 @@ export const AgentEditorNodeButtons: React.FC<{
 					/>
 				</div>
 			)}
-			{shouldShowFinalNodeButton && needsEnding && (
+			{needsEnding && (
 				<div className={AENButtonEnding}>
 					<Button
 						data-side="center"

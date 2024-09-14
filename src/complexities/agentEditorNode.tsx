@@ -5,7 +5,12 @@ import { useStore } from 'src/store/useStore';
 
 import { Handle, Position } from '@xyflow/react';
 
-import { AENContainerStyle, AENInnerStyle, AENOutlineStyle } from './agentEditorNode.css';
+import {
+	AENContainerStyle,
+	AENInnerStyle,
+	AENOutlineStyle,
+	AENPadderStyle,
+} from './agentEditorNode.css';
 import { useNodeDetails } from './agentEditorNode.hooks';
 import { AgentEditorNodeButtons } from './agentEditorNodeButtons';
 import { AgentEditorNodeContents } from './agentEditorNodeContents';
@@ -43,32 +48,43 @@ export const AgentEditorNode: React.FC<AENode> = observer(
 			}
 		}, [details?.nodeType, nodeId]);
 
+		let needsEnding =
+			(details?.nodeType == 'start_call' ||
+				details?.nodeType == 'default') &&
+			data.needsEnding;
+
 		return (
 			<div
-				className={`${AENContainerStyle} rendered-node`}
-				data-node-id={nodeId}
+				className={`${AENPadderStyle({
+					canReceiveEndingNode: needsEnding,
+				})}`}
 			>
-				<div className={AENInnerStyle({ selected })}>
-					<Handle
-						type="source"
-						position={Position.Bottom}
-						style={{ visibility: 'hidden' }}
-					/>
-					{contents}
-					<div className={AENOutlineStyle({ selected })} />
-					<Handle
-						type="target"
-						position={Position.Top}
-						style={{ visibility: 'hidden' }}
-					/>
-					{details?.nodeType == 'end_call' ? (
-						<></>
-					) : (
-						<AgentEditorNodeButtons
-							nodeId={nodeId}
-							needsEnding={data.needsEnding}
+				<div
+					className={`${AENContainerStyle} rendered-node`}
+					data-node-id={nodeId}
+				>
+					<div className={AENInnerStyle({ selected })}>
+						<Handle
+							type="source"
+							position={Position.Bottom}
+							style={{ visibility: 'hidden' }}
 						/>
-					)}
+						{contents}
+						<div className={AENOutlineStyle({ selected })} />
+						<Handle
+							type="target"
+							position={Position.Top}
+							style={{ visibility: 'hidden' }}
+						/>
+						{details?.nodeType == 'end_call' ? (
+							<></>
+						) : (
+							<AgentEditorNodeButtons
+								nodeId={nodeId}
+								needsEnding={needsEnding}
+							/>
+						)}
+					</div>
 				</div>
 			</div>
 		);
