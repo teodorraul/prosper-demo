@@ -52,11 +52,19 @@ export const AgentEditorNode: React.FC<AENode> = observer(
 			(details?.nodeType == 'start_call' ||
 				details?.nodeType == 'default') &&
 			data.needsEnding;
+		let extractsData = (details?.userData?.length ?? 0) > 0;
 
+		const paddingType = useMemo(() => {
+			if (needsEnding && extractsData)
+				return 'canReceiveEndingNodeAndHasDataExtraction';
+			if (needsEnding) return 'canReceiveEndingNode';
+			if (extractsData) return 'hasDataExtraction';
+			return 'default';
+		}, [needsEnding, extractsData]);
 		return (
 			<div
 				className={`${AENPadderStyle({
-					canReceiveEndingNode: needsEnding,
+					layout: paddingType,
 				})}`}
 			>
 				<div

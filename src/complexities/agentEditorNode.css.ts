@@ -5,10 +5,19 @@ import { recipe } from '@vanilla-extract/recipes';
 
 export const AENPadderStyle = recipe({
 	variants: {
-		canReceiveEndingNode: {
-			true: {
+		layout: {
+			canReceiveEndingNode: {
 				// Enough to fit the End Call Node button
 				marginBottom: 146,
+			},
+			hasDataExtraction: {
+				marginBottom: 16,
+			},
+			default: {
+				marginBottom: 0,
+			},
+			canReceiveEndingNodeAndHasDataExtraction: {
+				marginBottom: 256,
 			},
 		},
 	},
