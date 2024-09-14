@@ -15,10 +15,14 @@ export const useAgentEditorSpanner = () => {
 
 	useEffect(() => {
 		const vp = flow.getViewport();
-		if (node && node.measured) {
+		let rendered = document.querySelector(
+			`[data-node-id="${selectedNode}"] .rendered-node`
+		);
+		const renderedNodeActualBoundingBox = rendered?.getBoundingClientRect();
+		if (node && node.measured && renderedNodeActualBoundingBox) {
 			let bounds = getNodesBounds([node]);
-			let centerX = bounds.x + bounds.width / 2;
-			let centerY = bounds.y + bounds.height / 2;
+			let centerX = bounds.x + renderedNodeActualBoundingBox.width / 2;
+			let centerY = bounds.y + renderedNodeActualBoundingBox.height / 2;
 			vp.x = bounds.x;
 			vp.y = bounds.y;
 

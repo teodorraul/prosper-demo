@@ -59,11 +59,12 @@ export const AgentEditorNode: React.FC<AENode> = observer(
 					canReceiveEndingNode: needsEnding,
 				})}`}
 			>
-				<div
-					className={`${AENContainerStyle} rendered-node`}
-					data-node-id={nodeId}
-				>
-					<div className={AENInnerStyle({ selected })}>
+				<div className={`${AENContainerStyle}`} data-node-id={nodeId}>
+					<div
+						className={`${AENInnerStyle({
+							selected,
+						})} rendered-node`}
+					>
 						<Handle
 							type="source"
 							position={Position.Bottom}
