@@ -119,8 +119,6 @@ export const AgentEditor = observer(() => {
 			const centerX = rect.left + rect.width / 2;
 			let nodeId = targetElement.getAttribute('data-node-id');
 
-			console.log(nodeId);
-
 			if (event.clientX < centerX) {
 				store.agentEditor.setHoveredNode({
 					id: nodeId,

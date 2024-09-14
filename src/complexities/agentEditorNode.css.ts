@@ -7,7 +7,8 @@ export const AENPadderStyle = recipe({
 	variants: {
 		canReceiveEndingNode: {
 			true: {
-				marginBottom: 200,
+				// Enough to fit the End Call Node button
+				marginBottom: 146,
 			},
 		},
 	},

@@ -1,5 +1,3 @@
-console.log(process.env.ROOT_PATH);
-
 import './supabase/index';
 
 import { Provider } from 'mobx-react';

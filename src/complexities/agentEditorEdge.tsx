@@ -34,6 +34,7 @@ export const AgentEditorEdge = observer(
 					interactionWidth={20}
 					style={{
 						...style,
+						strokeWidth: 1.5,
 						stroke: Colors.editor.edge,
 					}}
 				/>

@@ -282,20 +282,20 @@ export class AgentEditorStore {
 			node.data.needsEnding = needsEnding;
 		}
 
-		const { layoutedEdges, layoutedNodes } = this.layoutTree(
-			unlayoutedNodes,
-			unlayoutedEdges
-		);
+		// const { layoutedEdges, layoutedNodes } = this.layoutTree(
+		// 	unlayoutedNodes,
+		// 	unlayoutedEdges
+		// );
 
 		this.nodeCountForNodeId = {};
-		for (const edge of layoutedEdges) {
+		for (const edge of unlayoutedEdges) {
 			if (!this.nodeCountForNodeId[edge.source]) {
 				this.nodeCountForNodeId[edge.source] = 0;
 			}
 			this.nodeCountForNodeId[edge.source]++;
 		}
 
-		this.setNodesAndEdges(layoutedNodes, layoutedEdges);
+		this.setNodesAndEdges(unlayoutedNodes, unlayoutedEdges);
 
 		this.prompt = pendingPrompt ?? agent.workflow.generalInstructions;
 	};
@@ -341,34 +341,28 @@ export class AgentEditorStore {
 
 		Dagre.layout(g);
 
-		let minYByRank: any = {};
+		let maxHeightForRank: any = {};
 
 		nodes.map((node) => {
-			const position = g.node(node.id);
-			let rank = position.rank as any;
-
-			let nd = this.nodeDetails.get(node.id);
-			if (nd) {
-				nd.rank = rank;
-			}
-			let y = position.y - (node.measured?.height ?? 0) / 2;
-			if (minYByRank[rank] === undefined || y > minYByRank[rank]) {
-				minYByRank[rank] = y;
-			}
-		});
-
-		g.nodes().forEach(function (v) {
-			let node = g.node(v) as any;
-			if (node) {
-				node.y = minYByRank[node.rank];
+			const n = g.node(node.id);
+			let rank = n.rank as number;
+			if (
+				maxHeightForRank[rank] === undefined ||
+				maxHeightForRank[rank] < n.height
+			) {
+				maxHeightForRank[rank] = n.height;
 			}
 		});
 
 		return {
 			layoutedNodes: nodes.map((node) => {
 				const position = g.node(node.id);
+				let rank = position.rank as number;
+				let maxHeight = maxHeightForRank[rank];
+				let nodeHeight = node.measured?.height ?? 0;
 				const x = position.x - (node.measured?.width ?? 0) / 2;
-				const y = position.y;
+				const y =
+					position.y - nodeHeight / 2 - (maxHeight - nodeHeight) / 2;
 
 				return { ...node, position: { x, y } };
 			}),
@@ -517,7 +511,6 @@ export class AgentEditorStore {
 			parentId: parentNodeId,
 			nodeDetails: new AgentWorkflowNode(payload),
 		});
-		console.log(payload);
 
 		for (const q of this.syncQueue) {
 			if (q.operation == 'delete-node' && q.id == nodeId) {
