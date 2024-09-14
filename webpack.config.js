@@ -5,13 +5,16 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const webpack = require('webpack');
 const CopyPlugin = require('copy-webpack-plugin');
 
+let isDev = process.env.IS_DEVELOPMENT ?? true;
+let subdir = process.env.SUBDIR ?? '';
+
 module.exports = {
 	entry: './src/index.tsx',
 	mode: 'development',
 	output: {
 		filename: 'bundle.[fullhash].js',
 		path: path.resolve(__dirname, 'dist'),
-		publicPath: process.env.IS_DEVELOPMENT ? "/" : process.env.SUBDIR,
+		publicPath: isDev ? '/' : process.env.SUBDIR,
 	},
 	devServer: {
 		historyApiFallback: true,
@@ -30,11 +33,9 @@ module.exports = {
 			'process.env.SUPABASE_ANON_KEY': JSON.stringify(
 				process.env.SUPABASE_ANON_KEY
 			),
-			'process.env.IS_DEVELOPMENT': process.env.IS_DEVELOPMENT,
+			'process.env.IS_DEVELOPMENT': isDev,
 			// This enables `/subdir/<APP>` as root deployments
-			'process.env.ROOT_PATH': JSON.stringify(
-				process.env.SUBDIR
-			)
+			'process.env.ROOT_PATH': JSON.stringify(subdir),
 		}),
 		new VanillaExtractPlugin(),
 		new MiniCssExtractPlugin(),
