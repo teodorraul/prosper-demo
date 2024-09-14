@@ -337,7 +337,7 @@ export class AgentEditorStore {
 			rankdir: 'TB',
 			align: 'UL',
 			ranker: 'network-simplex',
-			ranksep: 20,
+			ranksep: 60,
 			nodesep: 80,
 		});
 

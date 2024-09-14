@@ -36,6 +36,8 @@ export class AgentsStore {
 			agents.push(new Agent(remoteAgent));
 		}
 
+		agents.sort((a, b) => (a.createdAt > b.createdAt ? -1 : 1));
+
 		this.storeAgents(agents);
 		this.setFetchStatus('done');
 	};
@@ -83,7 +85,11 @@ export class AgentsStore {
 		await this.fetchAgents(true);
 	};
 
-	applyAgentOp = async (id: string, op: SyncOperation, opHasChangedInTheMeanTime: (op: SyncOperation) => boolean) => {
+	applyAgentOp = async (
+		id: string,
+		op: SyncOperation,
+		opHasChangedInTheMeanTime: (op: SyncOperation) => boolean
+	) => {
 		let { data, error } = await Supa.from(TABLE).select().eq('id', id);
 		let agent = data?.[0] as RemoteAgent;
 
@@ -111,8 +117,8 @@ export class AgentsStore {
 					}
 					break;
 				case 'update-prompt':
-					agent.data.general_instructions = op.prompt ?? ""
-					break
+					agent.data.general_instructions = op.prompt ?? '';
+					break;
 				case 'delete-node':
 					agent.data.nodes = agent.data.nodes.filter(
 						(f) => f.id != op.id
@@ -129,9 +135,9 @@ export class AgentsStore {
 
 			let remoteAgent = data?.[0] as RemoteAgent;
 			let newAgent = new Agent(remoteAgent);
-			
+
 			if (opHasChangedInTheMeanTime(op)) {
-				return { error: "postponed" }
+				return { error: 'postponed' };
 			}
 
 			this.updateAgent(newAgent);
