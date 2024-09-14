@@ -12,6 +12,7 @@ export const AgentEditorSidebarContainerStyle = style({
 	right: 0,
 	display: 'flex',
 	flexDirection: 'column',
+	zIndex: Colors.zIndexes.hud,
 });
 
 export const AgentEditorSidebarStyle = style({

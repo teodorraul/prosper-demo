@@ -27,8 +27,13 @@ export const Colors = {
 		s1: '#D1E1E4',
 		s2: '#B4D6DD',
 	},
+	neutralBackground: {
+		r: '#E3E7E5',
+		s1: '#D5DBD8',
+		s2: '#D0D0D0',
+	},
 	editor: {
-		edge: '#ccc',
+		edge: '#bbb',
 	},
 	text: {
 		t4: '#BABABA',
@@ -44,5 +49,10 @@ export const Colors = {
 		background: 'rgba(255,255,255,0.7)',
 		shadows:
 			'0px 0px 0px 0.5px inset rgba(20,35,50,0.33), 0 1px 3px rgba(20,30,40,0.1)',
+	},
+	zIndexes: {
+		editor: 1,
+		overlay: 10,
+		hud: 100,
 	},
 };

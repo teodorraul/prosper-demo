@@ -63,7 +63,7 @@ export const AENOutlineStyle = recipe({
 		height: 'calc(100% + 20px)',
 		width: 'calc(100% + 20px)',
 		borderColor: 'rgba(0,0,0,0.2)',
-		background: Colors.background.s1,
+		background: Colors.neutralBackground.s2,
 		borderWidth: '2px',
 		borderStyle: 'solid',
 		borderRadius: 'calc(16px + 8px)',

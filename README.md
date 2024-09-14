@@ -13,3 +13,4 @@
 -   Improve the visuals for the data extraction panel (from the sidebar)
     You can hold `spacebar` to drag around the editor
 -   Select sibling on deletion
+- Refactor `Colors` object into `Guidelines`, as it now includes other presets

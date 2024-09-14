@@ -10,8 +10,6 @@ export const AENButtonsHolder = style({
 	height: 100,
 	width: '130%',
 	zIndex: -1,
-	//debug
-	// background: 'red',
 });
 
 const CommonBeforeStyles: CSSProperties = {

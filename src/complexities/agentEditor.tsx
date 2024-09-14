@@ -9,7 +9,7 @@ import { useClickHandler } from 'src/hooks/useClickHandler';
 import { useAgentEditor } from 'src/store/agentEditor.hooks';
 import { useStore } from 'src/store/useStore';
 
-import { Background, BackgroundVariant, ReactFlow } from '@xyflow/react';
+import { ReactFlow } from '@xyflow/react';
 
 import {
 	AgentEditorChartStyle,
@@ -22,6 +22,11 @@ import { AgentEditorEdge } from './agentEditorEdge';
 import { AgentEditorNode } from './agentEditorNode';
 import { AgentEditorSidebar } from './agentEditorSidebar';
 import { AgentEditorSyncingBar } from './agentEditorSyncingBar';
+
+let fitViewOptions = {
+	minZoom: 1,
+	maxZoom: 1,
+};
 
 export const AgentEditor = observer(() => {
 	let { id: agentId } = useParams();
@@ -100,19 +105,21 @@ export const AgentEditor = observer(() => {
 	);
 
 	useAgentEditor(agentId);
-	useAgentEditorSpanner();
+	let { disablingOverlay } = useAgentEditorSpanner();
 
 	let state = rootStore.agentEditor;
 
 	const handleMouseMoved = useCallback((event: any) => {
-		let targetElement = event.target.classList.contains('rendered-node')
+		let targetElement = event.target.classList.contains('mouse-move-target')
 			? event.target
-			: event.target.closest('.rendered-node');
+			: event.target.closest('.mouse-move-target');
 
 		if (targetElement) {
 			const rect = targetElement.getBoundingClientRect();
 			const centerX = rect.left + rect.width / 2;
 			let nodeId = targetElement.getAttribute('data-node-id');
+
+			console.log(nodeId);
 
 			if (event.clientX < centerX) {
 				store.agentEditor.setHoveredNode({
@@ -161,14 +168,6 @@ export const AgentEditor = observer(() => {
 				nodesConnectable={!isSpacePressed}
 				elementsSelectable={!isSpacePressed}
 				onClick={handleClick}
-				onEdgeDoubleClick={(e) => {
-					e.preventDefault();
-					e.stopPropagation();
-				}}
-				onEdgeContextMenu={(e) => {
-					e.preventDefault();
-					e.stopPropagation();
-				}}
 				zoomOnScroll={false}
 				nodeClickDistance={50}
 				panOnScroll={true}
@@ -176,20 +175,18 @@ export const AgentEditor = observer(() => {
 				panOnDrag={isSpacePressed}
 				zoomOnDoubleClick={false}
 				fitView
-				fitViewOptions={{
-					minZoom: 1,
-					maxZoom: 1,
-				}}
+				fitViewOptions={fitViewOptions}
 			>
-				<Background
+				{/* <Background
 					id="1"
 					className={AgentEditorStyle}
 					gap={25}
 					size={2}
 					color="rgba(0,0,0,0.2)"
 					variant={BackgroundVariant.Dots}
-				/>
+				/> */}
 			</ReactFlow>
+			{disablingOverlay}
 			<AgentEditorSidebar />
 			<AgentEditorSyncingBar />
 		</main>

@@ -59,7 +59,10 @@ export const AgentEditorNode: React.FC<AENode> = observer(
 					canReceiveEndingNode: needsEnding,
 				})}`}
 			>
-				<div className={`${AENContainerStyle}`} data-node-id={nodeId}>
+				<div
+					className={`${AENContainerStyle} mouse-move-target`}
+					data-node-id={nodeId}
+				>
 					<div
 						className={`${AENInnerStyle({
 							selected,
